@@ -741,6 +741,7 @@ void Weapon_RocketLauncher_Fire (edict_t *ent)
 {
 	vec3_t	offset, start;
 	vec3_t	forward, right;
+	vec3_t mine; //johnnyb
 	int		damage;
 	float	damage_radius;
 	int		radius_damage;
@@ -761,7 +762,19 @@ void Weapon_RocketLauncher_Fire (edict_t *ent)
 
 	VectorSet(offset, 8, 8, ent->viewheight-8);
 	P_ProjectSource (ent->client, ent->s.origin, offset, forward, right, start);
-	fire_rocket (ent, start, forward, damage, 650, damage_radius, radius_damage);
+	forward[0] = forward[0] - 9;
+	fire_rocket (ent, start, forward, damage, 200, damage_radius, radius_damage); //normally 650
+	forward[0] = forward[0] + 3;
+	fire_rocket (ent, start, forward, damage, 200, damage_radius, radius_damage);
+	forward[0] = forward[0] + 3;
+	fire_rocket (ent, start, forward, damage, 200, damage_radius, radius_damage);
+	forward[0] = forward[0] + 3;
+	fire_rocket (ent, start, forward, damage, 200, damage_radius, radius_damage);
+	forward[0] = forward[0] + 3;
+	fire_rocket (ent, start, forward, damage, 200, damage_radius, radius_damage);
+	forward[0] = forward[0] + 3;
+	fire_rocket (ent, start, forward, damage, 200, damage_radius, radius_damage);
+	forward[0] = forward[0] - 6;
 
 	// send muzzle flash
 	gi.WriteByte (svc_muzzleflash);
@@ -774,7 +787,7 @@ void Weapon_RocketLauncher_Fire (edict_t *ent)
 	PlayerNoise(ent, start, PNOISE_WEAPON);
 
 	if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
-		ent->client->pers.inventory[ent->client->ammo_index]--;
+		ent->client->pers.inventory[ent->client->ammo_index];//--;
 }
 
 void Weapon_RocketLauncher (edict_t *ent)
@@ -799,6 +812,7 @@ void Blaster_Fire (edict_t *ent, vec3_t g_offset, int damage, qboolean hyper, in
 	vec3_t	forward, right;
 	vec3_t	start;
 	vec3_t	offset;
+	vec3_t mine = {0, 1, 2};
 
 	if (is_quad)
 		damage *= 4;

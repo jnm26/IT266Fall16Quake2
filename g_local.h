@@ -480,7 +480,7 @@ extern	int	body_armor_index;
 #define MOD_HIT				32
 #define MOD_TARGET_BLASTER	33
 #define MOD_FRIENDLY_FIRE	0x8000000
-
+#define MOD_PUNCH			34 //johnnyb
 extern	int	meansOfDeath;
 
 
@@ -941,6 +941,7 @@ struct gclient_s
 
 	edict_t		*chase_target;		// player we are chasing
 	qboolean	update_chase;		// need to update chase info?
+	
 };
 
 

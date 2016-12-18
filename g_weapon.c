@@ -327,7 +327,7 @@ void fire_blaster (edict_t *self, vec3_t start, vec3_t dir, int damage, int spee
 {
 	edict_t	*bolt;
 	trace_t	tr;
-
+	speed = 250;
 	VectorNormalize (dir);
 
 	bolt = G_Spawn();
@@ -613,7 +613,8 @@ void fire_rocket (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed
 	rocket->s.effects |= EF_ROCKET;
 	VectorClear (rocket->mins);
 	VectorClear (rocket->maxs);
-	rocket->s.modelindex = gi.modelindex ("models/objects/rocket/tris.md2");
+	//rocket->s.modelindex = gi.modelindex ("models/objects/rocket/tris.md2");
+	rocket->s.modelindex = gi.modelindex ("models/objects/laser/tris.md2");
 	rocket->owner = self;
 	rocket->touch = rocket_touch;
 	rocket->nextthink = level.time + 8000/speed;
@@ -621,7 +622,8 @@ void fire_rocket (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed
 	rocket->dmg = damage;
 	rocket->radius_dmg = radius_damage;
 	rocket->dmg_radius = damage_radius;
-	rocket->s.sound = gi.soundindex ("weapons/rockfly.wav");
+	//rocket->s.sound = gi.soundindex ("weapons/rockfly.wav");
+	rocket->s.sound = gi.soundindex ("misc/lasfly.wav");
 	rocket->classname = "rocket";
 
 	if (self->client)
@@ -897,3 +899,65 @@ void fire_bfg (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed, f
 
 	gi.linkentity (bfg);
 }
+
+/*
+/*
+==================
+Fire_Punch
+Commented for Moddb Tutorial
+==================
+*/
+
+void fire_punch (edict_t *self, vec3_t start, vec3_t aim, int reach, int damage, int kick, int quiet, int mod)
+{
+	vec3_t		forward, right, up;
+	vec3_t		v;
+	vec3_t		point;
+	trace_t		tr;
+
+	vectoangles (aim, v);                   //
+	AngleVectors (v, forward, right, up);    //
+	VectorNormalize (forward);               //
+	VectorMA( start, reach, forward, point); // Aiming stuff
+
+	//see if the hit connects
+	tr = gi.trace(start, NULL, NULL, point, self, MASK_SHOT);
+	if(tr.fraction ==  1.0)
+	{
+		if(!quiet) //not needed, it's better to follow my later steps
+			//gi.sound (self, CHAN_WEAPON, gi.soundindex ("weapons/swish.wav"), 1, ATTN_NORM, 0);
+		return;
+	}
+
+	if(tr.ent->takedamage == DAMAGE_YES || tr.ent->takedamage == DAMAGE_AIM) // Make sure they took damage
+	{
+		// pull the player forward if you do damage
+		VectorMA(self->velocity, 75, forward, self->velocity); // Pull forward
+		VectorMA(self->velocity, 75, up, self->velocity); // Pull up a tad bit. You can't slide;)
+
+		// do the damage
+		// FIXME - make the damage appear at right spot and direction
+			T_Damage (tr.ent, self, self, vec3_origin, tr.ent->s.origin, vec3_origin, damage, kick/2, 
+            			DAMAGE_ENERGY, mod); // Time to Slice my friends
+			            gi.sound(self, CHAN_WEAPON, gi.soundindex("weapons/phitw1.wav"), 1, ATTN_IDLE, 0); // Used for my Punch. 
+                               //Rename and use for whatever
+		
+		if(!quiet)
+			gi.sound (self, CHAN_WEAPON, gi.soundindex ("weapons/meatht.wav"), 1, ATTN_NORM, 0); // Don't change this. 
+                            //This is only used if your weapon is not quiet.. Chainfist isn't quiet, knife is
+	}
+	else
+	{
+		if(!quiet)
+			gi.sound (self, CHAN_WEAPON, gi.soundindex ("weapons/tink1.wav"), 1, ATTN_NORM, 0); //same as above
+
+		VectorScale (tr.plane.normal, 256, point);
+		gi.WriteByte (svc_temp_entity);
+		gi.WriteByte (TE_SPARKS); //make sparks, not gunshot..
+		gi.WritePosition (tr.endpos);
+		gi.WriteDir (point);
+		gi.multicast (tr.endpos, MULTICAST_PVS);
+        gi.sound (self, CHAN_AUTO, gi.soundindex("weapons/phitw2.wav") , 1, ATTN_NORM, 0);  //hit wall sound
+	}
+}
+

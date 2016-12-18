@@ -838,7 +838,8 @@ void SP_worldspawn (edict_t *ent)
 
 	snd_fry = gi.soundindex ("player/fry.wav");	// standing in lava / slime
 
-	PrecacheItem (FindItem ("Blaster"));
+	//PrecacheItem (FindItem ("Blaster")); johnnyb
+	PrecacheItem (FindItem ("Hands"));
 
 	gi.soundindex ("player/lava1.wav");
 	gi.soundindex ("player/lava2.wav");

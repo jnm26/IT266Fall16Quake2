@@ -364,6 +364,10 @@ void ClientObituary (edict_t *self, edict_t *inflictor, edict_t *attacker)
 				message = "tried to invade";
 				message2 = "'s personal space";
 				break;
+			case MOD_PUNCH:
+				message = "too";
+				message2 = "'s fist in the face";
+				break;
 			}
 			if (message)
 			{
@@ -398,10 +402,16 @@ void TossClientWeapon (edict_t *self)
 	if (!deathmatch->value)
 		return;
 
-	item = self->client->pers.weapon;
+	/*item = self->client->pers.weapon;
 	if (! self->client->pers.inventory[self->client->ammo_index] )
 		item = NULL;
 	if (item && (strcmp (item->pickup_name, "Blaster") == 0))
+		item = NULL;*/ //johnnyb
+
+	item = self->client->pers.weapon;
+	if (! self->client->pers.inventory[self->client->ammo_index] )
+		item = NULL;
+	if (item && (strcmp (item->pickup_name, "Hands") == 0))
 		item = NULL;
 
 	if (!((int)(dmflags->value) & DF_QUAD_DROP))
@@ -591,10 +601,13 @@ void InitClientPersistant (gclient_t *client)
 
 	memset (&client->pers, 0, sizeof(client->pers));
 
-	item = FindItem("Blaster");
+	/*item = FindItem("Blaster");
+	client->pers.selected_item = ITEM_INDEX(item);
+	client->pers.inventory[client->pers.selected_item] = 1;*/
+
+	item = FindItem("Hands");
 	client->pers.selected_item = ITEM_INDEX(item);
 	client->pers.inventory[client->pers.selected_item] = 1;
-
 	client->pers.weapon = item;
 
 	client->pers.health			= 100;

@@ -1293,7 +1293,7 @@ gitem_t	itemlist[] =
 },*/
 
 {//johnnyb
-        "weapon_blaster",           //  The map entity name. dont include this in a map whatever you do.
+        "weapon_null",           //  The map entity name. dont include this in a map whatever you do.
         NULL,                    // The pickup function
         Use_Weapon,              // How to use
         NULL,                    // the drop function

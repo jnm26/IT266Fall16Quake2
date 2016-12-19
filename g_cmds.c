@@ -761,6 +761,77 @@ void Cmd_Wave_f (edict_t *ent)
 }
 
 /*
+=================
+Cmd_Push_f
+Added by Paril for Push/Pull
+=================
+*/
+void Cmd_Push_f (edict_t *ent)
+{
+ vec3_t  start;
+ vec3_t  forward;
+ vec3_t  end;
+ trace_t tr;
+
+ if (ent->client->pers.inventory[ITEM_INDEX(FindItem ("Cells"))] <= 9) // requires 10 cells
+{
+    gi.cprintf (ent, PRINT_HIGH, "You need 10 mana to use Push\n"); // Notify them
+    return; // Stop the command from going
+}
+
+ VectorCopy(ent->s.origin, start); // Copy your location
+ start[2] += ent->viewheight; // vector for start is at your height of view
+ AngleVectors(ent->client->v_angle, forward, NULL, NULL); // Angles
+ VectorMA(start, 8192, forward, end); // How far will the line go?
+ tr = gi.trace(start, NULL, NULL, end, ent, MASK_SHOT); // Trace the line
+ if ( tr.ent && ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client)) ) // Trace the line
+ {
+        VectorScale(forward, 5000, forward); //Where to hit? Edit 5000 to whatever you like the push to be
+        VectorAdd(forward, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+		ent->client->pers.inventory[ITEM_INDEX(FindItem ("Cells"))] -= 10;
+	// set origin of laser beam
+      VectorMA (start, 8192, forward, end);
+      VectorCopy (ent->s.origin, start);
+      // trace for end point of laser beam.
+      // the laser aim is perfect. 
+      tr = gi.trace (start, NULL, NULL, end, ent, MASK_SHOT);      
+      // send laser beam temp entity to clients
+      VectorCopy (tr.endpos, start);
+      gi.WriteByte (svc_temp_entity);
+      gi.WriteByte (TE_BFG_LASER);      
+      gi.WritePosition (start);
+      gi.WritePosition (tr.endpos);
+      gi.multicast (ent->s.origin, MULTICAST_PHS);
+ }
+}
+
+/*
+=================
+Cmd_Pull_f
+Added by Paril for Push/Pull
+=================
+*/
+void Cmd_Pull_f (edict_t *ent)
+{
+ vec3_t  start;
+ vec3_t  forward;
+ vec3_t  end;
+ trace_t tr;
+
+ VectorCopy(ent->s.origin, start); // Copy your location
+ start[2] += ent->viewheight; // vector for start is at your height of view
+ AngleVectors(ent->client->v_angle, forward, NULL, NULL); // Angles
+ VectorMA(start, 8192, forward, end); // How far will the line go?
+ tr = gi.trace(start, NULL, NULL, end, ent, MASK_SHOT); // Trace the line
+ gi.sound (ent, CHAN_AUTO, gi.soundindex ("items/damage2.wav"), 1, ATTN_NORM, 0);
+ if ( tr.ent && ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client)) ) // Trace the line
+ {
+        VectorScale(forward, -5000, forward); //Where to hit? Edit -5000 to whatever you like the push to be
+        VectorAdd(forward, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+ }
+}
+
+/*
 ==================
 Cmd_Say_f
 ==================
@@ -966,6 +1037,10 @@ void ClientCommand (edict_t *ent)
 		Cmd_PutAway_f (ent);
 	else if (Q_stricmp (cmd, "wave") == 0)
 		Cmd_Wave_f (ent);
+	else if (Q_stricmp (cmd, "push") == 0)
+		Cmd_Push_f (ent);
+	else if (Q_stricmp (cmd, "pull") == 0)
+		Cmd_Pull_f (ent);
 	else if (Q_stricmp(cmd, "playerlist") == 0)
 		Cmd_PlayerList_f(ent);
 	else	// anything that doesn't match a command will be a chat

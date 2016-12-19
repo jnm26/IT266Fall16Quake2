@@ -157,7 +157,7 @@ typedef enum
 #define SFL_CROSS_TRIGGER_MASK	0x000000ff
 
 
-// noise types for PlayerNoise
+// noise types for PlayerNoise //johnnyb
 #define PNOISE_SELF				0
 #define PNOISE_WEAPON			1
 #define PNOISE_IMPACT			2

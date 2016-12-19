@@ -522,21 +522,21 @@ GRENADE
 ======================================================================
 */
 
-#define GRENADE_TIMER		3.0
-#define GRENADE_MINSPEED	400
-#define GRENADE_MAXSPEED	800
+#define GRENADE_TIMER		3.0 //normally 3.0
+#define GRENADE_MINSPEED	400 //400
+#define GRENADE_MAXSPEED	800 //800
 
 void weapon_grenade_fire (edict_t *ent, qboolean held)
 {
 	vec3_t	offset;
 	vec3_t	forward, right;
 	vec3_t	start;
-	int		damage = 125;
+	int		damage = 1; //normally 125
 	float	timer;
 	int		speed;
 	float	radius;
 
-	radius = damage+40;
+	radius = 500;
 	if (is_quad)
 		damage *= 4;
 
@@ -1355,6 +1355,12 @@ Added by Paril for Push/Pull
  vec3_t offset;
  vec3_t right;
 
+ if (ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] <= 9) // requires 10 cells
+{
+    gi.cprintf (ent, PRINT_HIGH, "You need 10 mana to use Push\n"); // Notify them
+    return; // Stop the command from going
+}
+ ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] -= 10;
  VectorCopy(ent->s.origin, start); // Copy your location
  start[2] += ent->viewheight; // vector for start is at your height of view
  AngleVectors(ent->client->v_angle, forward, NULL, NULL); // Angles
@@ -1481,8 +1487,8 @@ void Null_Fire(edict_t *ent)
 	vec3_t		start;
 	vec3_t		forward, right;
 	vec3_t		angles;
-	int			damage = 20; //change to whatever
-	int			kick = 4; //ditto here
+	int			damage = 999; //change to whatever
+	int			kick = 10; //ditto here
 	vec3_t		offset;
 
 	if (ent->client->ps.gunframe == 11) //rename 11 to after you're attack frame

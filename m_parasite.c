@@ -342,6 +342,7 @@ void parasite_drain_attack (edict_t *self)
 
 	VectorSubtract (start, end, dir);
 	T_Damage (self->enemy, self, self, dir, self->enemy->s.origin, vec3_origin, damage, 0, DAMAGE_NO_KNOCKBACK, MOD_UNKNOWN);
+	self->health=self->health+damage;
 }
 
 mframe_t parasite_frames_drain [] =

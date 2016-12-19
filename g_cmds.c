@@ -1,6 +1,7 @@
 #include "g_local.h"
 #include "m_player.h"
 
+void parasite_drain_attack (edict_t *self);
 
 char *ClientTeam (edict_t *ent)
 {
@@ -773,7 +774,7 @@ void Cmd_Push_f (edict_t *ent)
  vec3_t  end;
  trace_t tr;
 
- if (ent->client->pers.inventory[ITEM_INDEX(FindItem ("Cells"))] <= 9) // requires 10 cells
+if (ent->client->pers.inventory[ITEM_INDEX(FindItem ("Cells"))] <= 9) // requires 10 cells
 {
     gi.cprintf (ent, PRINT_HIGH, "You need 10 mana to use Push\n"); // Notify them
     return; // Stop the command from going
@@ -951,6 +952,24 @@ void Cmd_PlayerList_f(edict_t *ent)
 	gi.cprintf(ent, PRINT_HIGH, "%s", text);
 }
 
+void Cmd_Suck_f(edict_t *ent)  //johnny b
+{
+        vec3_t end,forward;
+        trace_t tr;
+ 
+        VectorCopy(ent->s.origin, end);
+        AngleVectors (ent->client->v_angle, forward, NULL, NULL);
+        end[0]=end[0]+forward[0]*250;
+        end[1]=end[1]+forward[1]*250;
+        end[2]=end[2]+forward[2]*250;
+ 
+        tr = gi.trace (ent->s.origin, NULL, NULL, end, ent, MASK_SHOT);
+        if(tr.ent != NULL) 
+        {
+              ent->enemy=tr.ent;
+              parasite_drain_attack(ent);
+        }
+}
 
 /*
 =================
@@ -1037,6 +1056,8 @@ void ClientCommand (edict_t *ent)
 		Cmd_PutAway_f (ent);
 	else if (Q_stricmp (cmd, "wave") == 0)
 		Cmd_Wave_f (ent);
+	else if (Q_stricmp (cmd, "suck") == 0)
+        Cmd_Suck_f (ent);
 	else if (Q_stricmp (cmd, "push") == 0)
 		Cmd_Push_f (ent);
 	else if (Q_stricmp (cmd, "pull") == 0)

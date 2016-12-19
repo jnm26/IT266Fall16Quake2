@@ -607,10 +607,10 @@ qboolean Pickup_Armor (edict_t *ent, edict_t *other)
 	// handle armor shards specially
 	if (ent->item->tag == ARMOR_SHARD)
 	{
-		if (!old_armor_index)
-			other->client->pers.inventory[jacket_armor_index] = 2;
-		else
-			other->client->pers.inventory[old_armor_index] += 2;
+		//if (!old_armor_index) //johnny b armor
+			//other->client->pers.inventory[jacket_armor_index] = 2;
+		//else
+			other->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] += 10;
 	}
 
 	// if player has no armor, just use it

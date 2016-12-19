@@ -780,7 +780,7 @@ SelectFarthestDeathmatchSpawnPoint
 
 ================
 */
-edict_t *SelectFarthestDeathmatchSpawnPoint (void)
+edict_t *SelectFarthestDeathmatchSpawnPoint (void) //johnny b teleport
 {
 	edict_t	*bestspot;
 	float	bestdistance, bestplayerdistance;

@@ -532,7 +532,7 @@ void fire_grenade2 (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int 
 		grenade->spawnflags = 1;
 	grenade->s.sound = gi.soundindex("weapons/hgrenc1b.wav");
 
-	if (timer <= 0.0)
+	if (timer <= 0.0) //normally 0.0
 		Grenade_Explode (grenade);
 	else
 	{

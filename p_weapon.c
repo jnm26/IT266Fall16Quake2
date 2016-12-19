@@ -1507,7 +1507,7 @@ BFG10K
 
 void weapon_bfg_fire (edict_t *ent)
 {
-	vec3_t	offset, start;
+	/*vec3_t	offset, start;
 	vec3_t	forward, right;
 	int		damage;
 	float	damage_radius = 1000;
@@ -1560,7 +1560,32 @@ void weapon_bfg_fire (edict_t *ent)
 	PlayerNoise(ent, start, PNOISE_WEAPON);
 
 	if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
-		ent->client->pers.inventory[ent->client->ammo_index] -= 50;
+		ent->client->pers.inventory[ent->client->ammo_index] -= 50;*/
+	vec3_t  start;
+	vec3_t  forward;
+	vec3_t  end;
+	trace_t tr;
+
+	VectorCopy(ent->s.origin, start); // Copy your location
+	start[2] += ent->viewheight; // vector for start is at your height of view
+	AngleVectors(ent->client->v_angle, forward, NULL, NULL); // Angles
+	VectorMA(start, 475, forward, end); // How far will the line go?
+	//int	content_mask = MASK_JOHN;
+	tr = gi.trace(start, NULL, NULL, end, ent, AREA_SOLID); // Trace the line
+	//tr.ent->svflags;
+	gi.sound (ent, CHAN_AUTO, gi.soundindex ("items/damage2.wav"), 1, ATTN_NORM, 0);
+	ent->client->ps.gunframe = 17;
+	ent->client->ps.gunframe++;
+	//if ( tr.ent && ((tr.ent->svflags) || (tr.ent->client)) ) // Trace the line
+	//{
+			tr.endpos 
+			ent->s.event = EV_PLAYER_TELEPORT;
+			//VectorCopy(end, ent->s.origin);
+			VectorCopy(tr.endpos, ent->s.origin);
+			//ent->s.origin = end;
+		    //VectorScale(forward, -5000, forward); //Where to hit? Edit -5000 to whatever you like the push to be
+			//VectorAdd(forward, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+	//}
 }
 
 void Weapon_BFG (edict_t *ent)

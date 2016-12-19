@@ -1578,6 +1578,72 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 	int		i, j;
 	pmove_t	pm;
 
+	//johnnyb
+	/*float ClassSpeedModifer, t;
+	vec3_t velo;
+	vec3_t  end, forward, right, up, add;
+
+	ClassSpeedModifer = ent->client->ClassSpeed * 0.2;
+	//Figure out speed
+    VectorClear (velo);
+	AngleVectors (ent->client->v_angle, forward, right, up);
+	VectorScale(forward, ucmd->forwardmove*ClassSpeedModifer, end);
+	VectorAdd(end,velo,velo);
+	AngleVectors (ent->client->v_angle, forward, right, up);
+	VectorScale(right, ucmd->sidemove*ClassSpeedModifer, end);
+	VectorAdd(end,velo,velo);
+	//if not in water set it up so they aren't moving up or down when they press forward
+	if (ent->waterlevel == 0)
+		velo[2] = 0;
+	if (ent->waterlevel==1)//feet are in the water
+	{
+		//Water slows you down or at least I think it should
+		velo[0] *= 0.875;
+		velo[1] *= 0.875;
+		velo[2] *= 0.875;
+		ClassSpeedModifer *= 0.875;
+	}
+	else if (ent->waterlevel==2)//waist is in the water
+	{
+		//Water slows you down or at least I think it should
+		velo[0] *= 0.75;
+		velo[1] *= 0.75;
+		velo[2] *= 0.75;
+		ClassSpeedModifer *= 0.75;
+	}
+	else if (ent->waterlevel==3)//whole body is in the water
+	{
+    	//Water slows you down or at least I think it should
+		velo[0] *= 0.6;
+		velo[1] *= 0.6;
+		velo[2] *= 0.6;
+		ClassSpeedModifer *= 0.6;
+	}
+	if (ent->groundentity)//add 
+		VectorAdd(velo,ent->velocity,ent->velocity);
+	else if (ent->waterlevel)
+		VectorAdd(velo,ent->velocity,ent->velocity);
+	else
+	{
+		//Allow for a little movement but not as much
+		velo[0] *= 0.25;
+		velo[1] *= 0.25;
+		velo[2] *= 0.25;
+		VectorAdd(velo,ent->velocity,ent->velocity);
+	}
+	//Make sure not going to fast. This slows down grapple too
+	t = VectorLength(ent->velocity);
+	if (t > 300*ClassSpeedModifer || t < -300*ClassSpeedModifer)
+	{
+		VectorScale (ent->velocity, 300 * ClassSpeedModifer / t, ent->velocity);
+	}
+ 
+	//Set these to 0 so pmove thinks we aren't pressing forward or sideways since we are handling all the player forward and sideways speeds
+	//ucmd->forwardmove = 0;
+	//ucmd->sidemove = 0; */
+	//mod done
+
+
 	level.current_entity = ent;
 	client = ent->client;
 
@@ -1705,6 +1771,7 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 
 	// save light level the player is standing on for
 	// monster sighting AI
+	//johnny b lighting
 	ent->light_level = ucmd->lightlevel;
 
 	// fire weapon from final position if needed

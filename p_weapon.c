@@ -295,6 +295,7 @@ void Use_Weapon (edict_t *ent, gitem_t *item)
 	int			ammo_index;
 	gitem_t		*ammo_item;
 
+	//ent->client->ClassSpeed = 5;
 	// see if we're already using it
 	if (item == ent->client->pers.weapon)
 		return;
@@ -1438,8 +1439,8 @@ void Null_Fire(edict_t *ent)
 	vec3_t		start;
 	vec3_t		forward, right;
 	vec3_t		angles;
-	int			damage = 5; //change to whatever
-	int			kick = 2; //ditto here
+	int			damage = 20; //change to whatever
+	int			kick = 4; //ditto here
 	vec3_t		offset;
 
 	if (ent->client->ps.gunframe == 11) //rename 11 to after you're attack frame

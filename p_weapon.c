@@ -864,7 +864,8 @@ void Weapon_Blaster (edict_t *ent)
 
 void Weapon_HyperBlaster_Fire (edict_t *ent)
 {
-	float	rotation;
+
+	/*float	rotation;
 	vec3_t	offset;
 	int		effect;
 	int		damage;
@@ -927,9 +928,104 @@ void Weapon_HyperBlaster_Fire (edict_t *ent)
 	{
 		gi.sound(ent, CHAN_AUTO, gi.soundindex("weapons/hyprbd1a.wav"), 1, ATTN_NORM, 0);
 		ent->client->weapon_sound = 0;
+	}*/
+	    vec3_t end,forward;
+        trace_t tr;
+ 
+        VectorCopy(ent->s.origin, end);
+        AngleVectors (ent->client->v_angle, forward, NULL, NULL);
+        end[0]=end[0]+forward[0]*250;
+        end[1]=end[1]+forward[1]*250;
+        end[2]=end[2]+forward[2]*250;
+		if (ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] <= 1) // requires 10 cells
+		{
+			gi.cprintf (ent, PRINT_HIGH, "You need 1 mana to use Suck\n"); // Notify them
+			return; // Stop the command from going
+		}
+		ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] -= 1;
+		ent->client->ps.gunframe++;
+        tr = gi.trace (ent->s.origin, NULL, NULL, end, ent, MASK_SHOT);
+        if(tr.ent != NULL) 
+        {
+              ent->enemy=tr.ent;
+              parasite_drain_attack2(ent);
+        }
+}
+
+static qboolean parasite_drain_attack_ok (vec3_t start, vec3_t end)
+{
+	vec3_t	dir, angles;
+
+	// check for max distance
+	VectorSubtract (start, end, dir);
+	if (VectorLength(dir) > 256)
+		return false;
+
+	// check for min/max pitch
+	vectoangles (dir, angles);
+	if (angles[0] < -180)
+		angles[0] += 360;
+	if (fabs(angles[0]) > 30)
+		return false;
+
+	return true;
+}
+
+//#define FRAME_drain03           41
+//#define FRAME_drain04           42
+void parasite_drain_attack2 (edict_t *self)
+{
+	int sound_impact = gi.soundindex("parasite/paratck2.wav");
+	int sound_suck = gi.soundindex("parasite/paratck3.wav");
+	vec3_t	offset, start, f, r, end, dir;
+	trace_t	tr;
+	int damage;
+
+	AngleVectors (self->s.angles, f, r, NULL);
+	VectorSet (offset, 24, 0, 6);
+	G_ProjectSource (self->s.origin, offset, f, r, start);
+
+	VectorCopy (self->enemy->s.origin, end);
+	if (!parasite_drain_attack_ok(start, end))
+	{
+		end[2] = self->enemy->s.origin[2] + self->enemy->maxs[2] - 8;
+		if (!parasite_drain_attack_ok(start, end))
+		{
+			end[2] = self->enemy->s.origin[2] + self->enemy->mins[2] + 8;
+			if (!parasite_drain_attack_ok(start, end))
+				return;
+		}
+	}
+	VectorCopy (self->enemy->s.origin, end);
+
+	tr = gi.trace (start, NULL, NULL, end, self, MASK_SHOT);
+	if (tr.ent != self->enemy)
+		return;
+
+	if (self->s.frame == 41)
+	{
+		damage = 4;
+		gi.sound (self->enemy, CHAN_AUTO, sound_impact, 1, ATTN_NORM, 0);
+	}
+	else
+	{
+		if (self->s.frame == 42)
+			gi.sound (self, CHAN_WEAPON, sound_suck, 1, ATTN_NORM, 0);
+		damage = 2;
 	}
 
+	gi.WriteByte (svc_temp_entity);
+	gi.WriteByte (TE_PARASITE_ATTACK);
+	gi.WriteShort (self - g_edicts);
+	gi.WritePosition (start);
+	gi.WritePosition (end);
+	gi.multicast (self->s.origin, MULTICAST_PVS);
+
+	VectorSubtract (start, end, dir);
+	T_Damage (self->enemy, self, self, dir, self->enemy->s.origin, vec3_origin, damage, 0, DAMAGE_NO_KNOCKBACK, MOD_UNKNOWN);
+	self->health=self->health+damage;
 }
+
 
 void Weapon_HyperBlaster (edict_t *ent)
 {
@@ -1355,7 +1451,7 @@ Added by Paril for Push/Pull
  vec3_t offset;
  vec3_t right;
 
- if (ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] <= 9) // requires 10 cells
+if (ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] <= 9) // requires 10 cells
 {
     gi.cprintf (ent, PRINT_HIGH, "You need 10 mana to use Push\n"); // Notify them
     return; // Stop the command from going

@@ -1578,7 +1578,6 @@ void weapon_bfg_fire (edict_t *ent)
 	ent->client->ps.gunframe++;
 	//if ( tr.ent && ((tr.ent->svflags) || (tr.ent->client)) ) // Trace the line
 	//{
-			tr.endpos 
 			ent->s.event = EV_PLAYER_TELEPORT;
 			//VectorCopy(end, ent->s.origin);
 			VectorCopy(tr.endpos, ent->s.origin);

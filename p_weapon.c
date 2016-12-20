@@ -1565,13 +1565,39 @@ void weapon_bfg_fire (edict_t *ent)
 	vec3_t  forward;
 	vec3_t  end;
 	trace_t tr;
+	trace_t tr2;
+	trace_t tr3;
 
 	VectorCopy(ent->s.origin, start); // Copy your location
 	start[2] += ent->viewheight; // vector for start is at your height of view
 	AngleVectors(ent->client->v_angle, forward, NULL, NULL); // Angles
 	VectorMA(start, 475, forward, end); // How far will the line go?
 	//int	content_mask = MASK_JOHN;
-	tr = gi.trace(start, NULL, NULL, end, ent, AREA_SOLID); // Trace the line
+	tr = gi.trace(start, NULL, NULL, end, ent, MASK_ALL); // Trace the line
+	VectorMA(start, 435, forward, end); // How far will the line go?
+	tr2 = gi.trace(start, NULL, NULL, end, ent, MASK_ALL); // Trace the line
+	//tr3.endpos[2] = tr2.endpos[2] - (tr3.endpos[2] - tr2.endpos[2]);
+	//tr3.endpos[1] = tr2.endpos[1] - (tr3.endpos[1] - tr2.endpos[1]);
+	//tr3.endpos[0] = tr2.endpos[0] - (tr3.endpos[0] - tr2.endpos[0]);
+	gi.dprintf("x: %i\n", tr.endpos[0]);
+	gi.dprintf("y: %i\n", tr.endpos[1]);
+	gi.dprintf("z: %i\n", tr.endpos[2]);
+
+	//tr.endpos[2] = tr.endpos[2] - 25;
+	//tr.endpos[1] = tr.endpos[1] - 25;
+	if(tr.endpos[1] > 0)
+		tr.endpos[1] = tr.endpos[1] - 30;
+	if(tr.endpos[1] < 0)
+		tr.endpos[1] = tr.endpos[1] + 30;
+	if(tr.endpos[0] > 0)
+		tr.endpos[0] = tr.endpos[0] - 30;
+	if(tr.endpos[0] < 0)
+		tr.endpos[0] = tr.endpos[0] + 30;
+	if(tr.endpos[2] > 0)
+		tr.endpos[2] = tr.endpos[2] - 30;
+	if(tr.endpos[2] < 0)
+		tr.endpos[2] = tr.endpos[2] + 30;
+	//tr.endpos = tr.endpos - 10;
 	//tr.ent->svflags;
 	gi.sound (ent, CHAN_AUTO, gi.soundindex ("items/damage2.wav"), 1, ATTN_NORM, 0);
 	ent->client->ps.gunframe = 17;
@@ -1581,6 +1607,7 @@ void weapon_bfg_fire (edict_t *ent)
 			ent->s.event = EV_PLAYER_TELEPORT;
 			//VectorCopy(end, ent->s.origin);
 			VectorCopy(tr.endpos, ent->s.origin);
+			//VectorCopy(tr2.endpos - (tr3.endpos - tr2.endpos), end->s.origin);
 			//ent->s.origin = end;
 		    //VectorScale(forward, -5000, forward); //Where to hit? Edit -5000 to whatever you like the push to be
 			//VectorAdd(forward, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors

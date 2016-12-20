@@ -923,8 +923,8 @@ void SP_worldspawn (edict_t *ent)
 //
 	//johnny b lighting
 	// 0 normal
-	//gi.configstring(CS_LIGHTS+0, "m");
-	gi.configstring(CS_LIGHTS+0, "wmamwamaaaaaaaaaaaaaaaaaaaaaaaaaaamwazwawwwwwwwwwwwwwwwwwwwwwww");
+	gi.configstring(CS_LIGHTS+0, "m");
+	//gi.configstring(CS_LIGHTS+0, "wmamwamaaaaaaaaaaaaaaaaaaaaaaaaaaamwazwawwwwwwwwwwwwwwwwwwwwwww");
 	// 1 FLICKER (first variety)
 	//gi.configstring(CS_LIGHTS+1, "mmnmmommommnonmmonqnmmo");
 	gi.configstring(CS_LIGHTS+1, "aaaaaaaazzzzzzzz");

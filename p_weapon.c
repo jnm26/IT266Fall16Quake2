@@ -536,7 +536,7 @@ void weapon_grenade_fire (edict_t *ent, qboolean held)
 	int		speed;
 	float	radius;
 
-	radius = 500;
+	radius = 1000;
 	if (is_quad)
 		damage *= 4;
 
@@ -548,9 +548,14 @@ void weapon_grenade_fire (edict_t *ent, qboolean held)
 	speed = GRENADE_MINSPEED + (GRENADE_TIMER - timer) * ((GRENADE_MAXSPEED - GRENADE_MINSPEED) / GRENADE_TIMER);
 	fire_grenade2 (ent, start, forward, damage, speed, timer, radius, held);
 
-	if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
-		ent->client->pers.inventory[ent->client->ammo_index]--;
-
+	//if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
+		//ent->client->pers.inventory[ent->client->ammo_index]--;
+	//if (ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] < 3) // requires 10 cells
+	//{
+		//gi.cprintf (ent, PRINT_HIGH, "You need 3 mana to use Grenade Distraction\n"); // Notify them
+		//return; // Stop the command from going
+	//}
+    //ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] -= 3;
 	ent->client->grenade_time = level.time + 1.0;
 
 	if(ent->deadflag || ent->s.modelindex != 255) // VWep animations screw up corpses
@@ -861,7 +866,7 @@ void Weapon_Blaster (edict_t *ent)
 	Weapon_Generic (ent, 4, 8, 52, 55, pause_frames, fire_frames, Weapon_Blaster_Fire);
 }
 
-
+int num = 0;
 void Weapon_HyperBlaster_Fire (edict_t *ent)
 {
 
@@ -931,19 +936,27 @@ void Weapon_HyperBlaster_Fire (edict_t *ent)
 	}*/
 	    vec3_t end,forward;
         trace_t tr;
- 
+		if (ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] < 6) // requires 10 cells
+		{
+			gi.cprintf (ent, PRINT_HIGH, "You need 6 mana to use Suck\n"); // Notify them
+			//ent->client->ps.gunframe = 32;
+			//ent->client->ps.gunframe++;
+			ent->client->ps.gunframe++;
+			return; // Stop the command from going
+		}
+		//ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] -= 1;
         VectorCopy(ent->s.origin, end);
         AngleVectors (ent->client->v_angle, forward, NULL, NULL);
         end[0]=end[0]+forward[0]*250;
         end[1]=end[1]+forward[1]*250;
         end[2]=end[2]+forward[2]*250;
-		if (ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] <= 1) // requires 10 cells
-		{
-			gi.cprintf (ent, PRINT_HIGH, "You need 1 mana to use Suck\n"); // Notify them
-			return; // Stop the command from going
-		}
-		ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] -= 1;
 		ent->client->ps.gunframe++;
+		num++;
+		if(num == 6)
+		{
+			ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] -= 6;
+			num = 0;
+		}
         tr = gi.trace (ent->s.origin, NULL, NULL, end, ent, MASK_SHOT);
         if(tr.ent != NULL) 
         {
@@ -1451,12 +1464,13 @@ Added by Paril for Push/Pull
  vec3_t offset;
  vec3_t right;
 
-if (ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] <= 9) // requires 10 cells
+if (ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] < 5) // requires 10 cells
 {
-    gi.cprintf (ent, PRINT_HIGH, "You need 10 mana to use Push\n"); // Notify them
+			gi.cprintf (ent, PRINT_HIGH, "You need 5 mana to use Push\n"); // Notify them
+			ent->client->ps.gunframe++;
     return; // Stop the command from going
 }
- ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] -= 10;
+ ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] -= 5;
  VectorCopy(ent->s.origin, start); // Copy your location
  start[2] += ent->viewheight; // vector for start is at your height of view
  AngleVectors(ent->client->v_angle, forward, NULL, NULL); // Angles
@@ -1568,6 +1582,14 @@ void weapon_bfg_fire (edict_t *ent)
 	trace_t tr2;
 	trace_t tr3;
 
+	if (ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] < 1) // requires 10 cells
+	{
+		gi.cprintf (ent, PRINT_HIGH, "You need 1 mana to use Teleport\n"); // Notify them
+			ent->client->ps.gunframe = 17;
+			ent->client->ps.gunframe++;
+		return; // Stop the command from going
+	}
+    ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] -= 1;
 	VectorCopy(ent->s.origin, start); // Copy your location
 	start[2] += ent->viewheight; // vector for start is at your height of view
 	AngleVectors(ent->client->v_angle, forward, NULL, NULL); // Angles

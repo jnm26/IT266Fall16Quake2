@@ -1348,7 +1348,7 @@ if (ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] < 5) // requires
 			gi.cprintf (ent, PRINT_HIGH, "You need 5 mana to use Push\n"); // Notify them
 			ent->client->ps.gunframe = 9;
 			ent->client->ps.gunframe++;
-			ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))];
+			//ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))];
     return; // Stop the command from going
 }
  ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] -= 5;

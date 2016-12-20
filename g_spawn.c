@@ -677,6 +677,15 @@ char *single_statusbar =
 "	pic	9 "
 "endif "
 
+// johnny b
+"if 18 "
+"	yb  -72 "
+"	xr	-58 "
+"	num 2	18 "
+"	xr	-24 "
+"	pic	19 "
+"endif "
+
 //  help / weapon icon 
 "if 11 "
 "	xv	148 "

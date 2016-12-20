@@ -1305,7 +1305,7 @@ gitem_t	itemlist[] =
        "Hands",             //Pickup name. use this to give the item to someone at the start of the game
         0,
         0,
-        NULL,
+        "Slugs",
         IT_WEAPON|IT_STAY_COOP,
         WEAP_BLASTER,            // the model index, just an integer defined in g_local.h
         NULL,
@@ -1352,7 +1352,7 @@ always owned, never in the world
 /* pickup */	"Shotgun",
 		0,
 		1,
-		"Shells",
+		"Slugs",
 		IT_WEAPON|IT_STAY_COOP,
 		WEAP_SHOTGUN,
 		NULL,

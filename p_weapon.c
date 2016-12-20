@@ -1289,7 +1289,7 @@ SHOTGUN / SUPERSHOTGUN
 
 void weapon_shotgun_fire (edict_t *ent)
 {
-	vec3_t		start;
+	/*vec3_t		start;
 	vec3_t		forward, right;
 	vec3_t		offset;
 	int			damage = 4;
@@ -1330,7 +1330,56 @@ void weapon_shotgun_fire (edict_t *ent)
 	PlayerNoise(ent, start, PNOISE_WEAPON);
 
 	if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
-		ent->client->pers.inventory[ent->client->ammo_index]--;
+		ent->client->pers.inventory[ent->client->ammo_index]--;*/
+//=================
+//Cmd_Pull_f
+//Added by Paril for Push/Pull
+//=================
+//*/
+ vec3_t  start;
+ vec3_t  forward;
+ vec3_t  end;
+ trace_t tr;
+ vec3_t offset;
+ vec3_t right;
+
+if (ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] < 5) // requires 10 cells
+{
+			gi.cprintf (ent, PRINT_HIGH, "You need 5 mana to use Push\n"); // Notify them
+			ent->client->ps.gunframe = 9;
+			ent->client->ps.gunframe++;
+    return; // Stop the command from going
+}
+ ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] -= 5;
+ VectorCopy(ent->s.origin, start); // Copy your location
+ start[2] += ent->viewheight; // vector for start is at your height of view
+ AngleVectors(ent->client->v_angle, forward, NULL, NULL); // Angles
+ VectorMA(start, 8192, forward, end); // How far will the line go?
+ tr = gi.trace(start, NULL, NULL, end, ent, MASK_SHOT); // Trace the line
+ gi.sound (ent, CHAN_AUTO, gi.soundindex ("items/damage2.wav"), 1, ATTN_NORM, 0);
+ ent->client->ps.gunframe = 9;
+ ent->client->ps.gunframe++;
+
+ //rail gun effect
+ 	AngleVectors (ent->client->v_angle, forward, right, NULL);
+
+	VectorScale (forward, -3, ent->client->kick_origin);
+	ent->client->kick_angles[0] = -3;
+
+	VectorSet(offset, 0, 7,  ent->viewheight-8);
+	P_ProjectSource (ent->client, ent->s.origin, offset, forward, right, start);
+	fire_rail (ent, start, forward, 0, 0);
+ 	// send muzzle flash
+	gi.WriteByte (svc_muzzleflash);
+	gi.WriteShort (ent-g_edicts);
+	gi.WriteByte (MZ_RAILGUN | is_silenced);
+	gi.multicast (ent->s.origin, MULTICAST_PVS);
+ if ( tr.ent && ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client)) ) // Trace the line
+ {
+        VectorScale(forward, 5000, forward); //Where to hit? Edit -5000 to whatever you like the push to be
+        VectorAdd(forward, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+ }
+ return;
 }
 
 void Weapon_Shotgun (edict_t *ent)

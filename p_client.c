@@ -1571,6 +1571,7 @@ This will be called once for each client frame, which will
 usually be a couple times for each server frame.
 ==============
 */
+int john;
 void ClientThink (edict_t *ent, usercmd_t *ucmd)
 {
 	gclient_t	*client;
@@ -1658,7 +1659,14 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 	}
 
 	pm_passent = ent;
-
+	john++;
+	if(john == 350 && ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] < 15)
+	{
+		john = 0;
+		ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))]++;
+	}
+	if(john > 350)
+		john = 0;
 	if (ent->client->chase_target) {
 
 		client->resp.cmd_angles[0] = SHORT2ANGLE(ucmd->angles[0]);

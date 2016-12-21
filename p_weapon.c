@@ -1494,63 +1494,203 @@ void weapon_supershotgun_fire (edict_t *ent)
 	storage[2] = start[2];
 
 	start[0] = start[0] - 9;
-	fire_rail (ent, start, forward, 0, 0);
+	fire_rail (ent, start, forward, 500, 10);
+ if ( tr.ent && ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client)) ) // Trace the line
+ {
+        VectorScale(forward, 5000, forward); //Where to hit? Edit -5000 to whatever you like the push to be
+        VectorAdd(forward, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+ }
 	start[0] = start[0] + 18;
-	fire_rail (ent, start, forward, 0, 0);
+	fire_rail (ent, start, forward, 500, 10);
+ if ( tr.ent && ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client)) ) // Trace the line
+ {
+        VectorScale(start, 5000, start); //Where to hit? Edit -5000 to whatever you like the push to be
+        VectorAdd(start, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+ }
 	start[0] = start[0] + 18;
-	fire_rail (ent, start, forward, 0, 0);
+	fire_rail (ent, start, forward, 500, 10);
+ if ( tr.ent && ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client)) ) // Trace the line
+ {
+        VectorScale(start, 5000, start); //Where to hit? Edit -5000 to whatever you like the push to be
+        VectorAdd(start, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+ }
 	start[0] = start[0] + 18;
-	fire_rail (ent, start, forward, 0, 0);
+	fire_rail (ent, start, forward, 500, 10);
+ if ( tr.ent && ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client)) ) // Trace the line
+ {
+        VectorScale(start, 5000, start); //Where to hit? Edit -5000 to whatever you like the push to be
+        VectorAdd(start, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+ }
 	start[0] = start[0] + 18;
-	fire_rail (ent, start, forward, 0, 0);
+	fire_rail (ent, start, forward, 500, 10);
+ if ( tr.ent && ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client)) ) // Trace the line
+ {
+        VectorScale(start, 5000, start); //Where to hit? Edit -5000 to whatever you like the push to be
+        VectorAdd(start, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+ }
 	start[0] = start[0] + 18;
-	fire_rail (ent, start, forward, 0, 0);
+	fire_rail (ent, start, forward, 500, 10);
+	 if ( tr.ent && ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client)) ) // Trace the line
+ {
+        VectorScale(start, 5000, start); //Where to hit? Edit -5000 to whatever you like the push to be
+        VectorAdd(start, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+ }
 	start[0] = start[0] + 18;
-	fire_rail (ent, start, forward, 0, 0);
+	fire_rail (ent, start, forward, 500, 10);
+ if ( tr.ent && ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client)) ) // Trace the line
+ {
+        VectorScale(start, 5000, start); //Where to hit? Edit -5000 to whatever you like the push to be
+        VectorAdd(start, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+ }
 		start[0] = start[0] - 9;
-	fire_rail (ent, start, forward, 0, 0);
+	fire_rail (ent, start, forward, 500, 10);
+	 if ( tr.ent && ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client)) ) // Trace the line
+ {
+        VectorScale(start, 5000, start); //Where to hit? Edit -5000 to whatever you like the push to be
+        VectorAdd(start, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+ }
 	start[0] = start[0] + 18;
-	fire_rail (ent, start, forward, 0, 0);
+	fire_rail (ent, start, forward, 500, 10);
+	 if ( tr.ent && ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client)) ) // Trace the line
+ {
+        VectorScale(start, 5000, start); //Where to hit? Edit -5000 to whatever you like the push to be
+        VectorAdd(start, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+ }
 	start[0] = start[0] + 18;
-	fire_rail (ent, start, forward, 0, 0);
+	fire_rail (ent, start, forward, 500, 10);
+	 if ( tr.ent && ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client)) ) // Trace the line
+ {
+        VectorScale(start, 5000, start); //Where to hit? Edit -5000 to whatever you like the push to be
+        VectorAdd(start, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+ }
 	start[0] = start[0] + 18;
-	fire_rail (ent, start, forward, 0, 0);
+	fire_rail (ent, start, forward, 500, 10);
+	 if ( tr.ent && ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client)) ) // Trace the line
+ {
+        VectorScale(start, 5000, start); //Where to hit? Edit -5000 to whatever you like the push to be
+        VectorAdd(start, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+ }
 	start[0] = start[0] + 18;
-	fire_rail (ent, start, forward, 0, 0);
+	fire_rail (ent, start, forward, 500, 10);
+	 if ( tr.ent && ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client)) ) // Trace the line
+ {
+        VectorScale(start, 5000, start); //Where to hit? Edit -5000 to whatever you like the push to be
+        VectorAdd(start, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+ }
 	start[0] = start[0] + 18;
-	fire_rail (ent, start, forward, 0, 0);
+	fire_rail (ent, start, forward, 500, 10);
+	 if ( tr.ent && ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client)) ) // Trace the line
+ {
+        VectorScale(start, 5000, start); //Where to hit? Edit -5000 to whatever you like the push to be
+        VectorAdd(start, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+ }
 	start[0] = start[0] + 18;
-	fire_rail (ent, start, forward, 0, 0);
+	fire_rail (ent, start, forward, 500, 10);
+	 if ( tr.ent && ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client)) ) // Trace the line
+ {
+        VectorScale(start, 5000, start); //Where to hit? Edit -5000 to whatever you like the push to be
+        VectorAdd(start, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+ }
 		start[0] = start[0] - 9;
-	fire_rail (ent, start, forward, 0, 0);
+	fire_rail (ent, start, forward, 500, 10);
+	 if ( tr.ent && ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client)) ) // Trace the line
+ {
+        VectorScale(start, 5000, start); //Where to hit? Edit -5000 to whatever you like the push to be
+        VectorAdd(start, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+ }
 	start[0] = start[0] + 18;
-	fire_rail (ent, start, forward, 0, 0);
+	fire_rail (ent, start, forward, 500, 10);
+	 if ( tr.ent && ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client)) ) // Trace the line
+ {
+        VectorScale(start, 5000, start); //Where to hit? Edit -5000 to whatever you like the push to be
+        VectorAdd(start, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+ }
 	start[0] = start[0] + 18;
-	fire_rail (ent, start, forward, 0, 0);
+	fire_rail (ent, start, forward, 500, 10);
+	 if ( tr.ent && ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client)) ) // Trace the line
+ {
+        VectorScale(start, 5000, start); //Where to hit? Edit -5000 to whatever you like the push to be
+        VectorAdd(start, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+ }
 	start[0] = start[0] + 18;
-	fire_rail (ent, start, forward, 0, 0);
+	fire_rail (ent, start, forward, 500, 10);
+	 if ( tr.ent && ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client)) ) // Trace the line
+ {
+        VectorScale(start, 5000, start); //Where to hit? Edit -5000 to whatever you like the push to be
+        VectorAdd(start, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+ }
 	start[0] = start[0] + 18;
-	fire_rail (ent, start, forward, 0, 0);
+	fire_rail (ent, start, forward, 500, 10);
+	 if ( tr.ent && ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client)) ) // Trace the line
+ {
+        VectorScale(start, 5000, start); //Where to hit? Edit -5000 to whatever you like the push to be
+        VectorAdd(start, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+ }
 	start[0] = start[0] + 18;
-	fire_rail (ent, start, forward, 0, 0);
+	fire_rail (ent, start, forward, 500, 10);
+	 if ( tr.ent && ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client)) ) // Trace the line
+ {
+        VectorScale(start, 5000, start); //Where to hit? Edit -5000 to whatever you like the push to be
+        VectorAdd(start, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+ }
 	start[0] = start[0] + 18;
-	fire_rail (ent, start, forward, 0, 0);
+	fire_rail (ent, start, forward, 500, 10);
+	 if ( tr.ent && ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client)) ) // Trace the line
+ {
+        VectorScale(start, 5000, start); //Where to hit? Edit -5000 to whatever you like the push to be
+        VectorAdd(start, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+ }
 		start[0] = start[0] - 9;
-	fire_rail (ent, start, forward, 0, 0);
+	fire_rail (ent, start, forward, 500, 10);
+	 if ( tr.ent && ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client)) ) // Trace the line
+ {
+        VectorScale(start, 5000, start); //Where to hit? Edit -5000 to whatever you like the push to be
+        VectorAdd(start, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+ }
 	start[0] = start[0] + 18;
-	fire_rail (ent, start, forward, 0, 0);
+	fire_rail (ent, start, forward, 500, 10);
+	 if ( tr.ent && ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client)) ) // Trace the line
+ {
+        VectorScale(start, 5000, start); //Where to hit? Edit -5000 to whatever you like the push to be
+        VectorAdd(start, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+ }
 	start[0] = start[0] + 18;
-	fire_rail (ent, start, forward, 0, 0);
+	fire_rail (ent, start, forward, 500, 10);
+	 if ( tr.ent && ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client)) ) // Trace the line
+ {
+        VectorScale(start, 5000, start); //Where to hit? Edit -5000 to whatever you like the push to be
+        VectorAdd(start, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+ }
 	start[0] = start[0] + 18;
-	fire_rail (ent, start, forward, 0, 0);
+	fire_rail (ent, start, forward, 500, 10);
+	 if ( tr.ent && ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client)) ) // Trace the line
+ {
+        VectorScale(start, 5000, start); //Where to hit? Edit -5000 to whatever you like the push to be
+        VectorAdd(start, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+ }
 	start[0] = start[0] + 18;
-	fire_rail (ent, start, forward, 0, 0);
+	fire_rail (ent, start, forward, 500, 10);
+	 if ( tr.ent && ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client)) ) // Trace the line
+ {
+        VectorScale(start, 5000, start); //Where to hit? Edit -5000 to whatever you like the push to be
+        VectorAdd(start, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+ }
 	start[0] = start[0] + 18;
-	fire_rail (ent, start, forward, 0, 0);
+	fire_rail (ent, start, forward, 500, 10);
+	 if ( tr.ent && ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client)) ) // Trace the line
+ {
+        VectorScale(start, 5000, start); //Where to hit? Edit -5000 to whatever you like the push to be
+        VectorAdd(start, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+ }
 	start[0] = start[0] + 18;
-	fire_rail (ent, start, forward, 0, 0);
+	fire_rail (ent, start, forward, 500, 10);
+	 if ( tr.ent && ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client)) ) // Trace the line
+ {
+        VectorScale(start, 5000, start); //Where to hit? Edit -5000 to whatever you like the push to be
+        VectorAdd(start, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+ }
 
-
+	 /*
 	storage[0] = storage[0] - 9;
 	fire_rail (ent, storage, forward, 0, 0);
 	storage[0] = storage[0] - 18;
@@ -1606,7 +1746,7 @@ void weapon_supershotgun_fire (edict_t *ent)
 	storage[0] = storage[0] - 18;
 	fire_rail (ent, storage, forward, 0, 0);
 	storage[0] = storage[0] - 18;
-	fire_rail (ent, storage, forward, 0, 0);
+	fire_rail (ent, storage, forward, 0, 0);*/
  	// send muzzle flash
 	gi.WriteByte (svc_muzzleflash);
 	gi.WriteShort (ent-g_edicts);

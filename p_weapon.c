@@ -539,7 +539,8 @@ void weapon_grenade_fire (edict_t *ent, qboolean held)
 	radius = 1000;
 	if (is_quad)
 		damage *= 4;
-
+	if (ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] < 1) // requires 10 cells
+		ent->client->pers.inventory[ent->client->ammo_index] = 1;
 	VectorSet(offset, 8, 8, ent->viewheight-8);
 	AngleVectors (ent->client->v_angle, forward, right, NULL);
 	P_ProjectSource (ent->client, ent->s.origin, offset, forward, right, start);
@@ -705,7 +706,15 @@ void weapon_grenadelauncher_fire (edict_t *ent)
 	radius = damage+40;
 	if (is_quad)
 		damage *= 4;
-
+	
+		if (ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] < 10) // requires 10 cells
+		{
+			gi.cprintf (ent, PRINT_HIGH, "You need 20 mana to use Suck\n"); // Notify them
+			//ent->client->ps.gunframe = 32;
+			//ent->client->ps.gunframe++;
+			ent->client->ps.gunframe++;
+			return; // Stop the command from going
+		}
 	VectorSet(offset, 8, 8, ent->viewheight-8);
 	AngleVectors (ent->client->v_angle, forward, right, NULL);
 	P_ProjectSource (ent->client, ent->s.origin, offset, forward, right, start);
@@ -713,8 +722,8 @@ void weapon_grenadelauncher_fire (edict_t *ent)
 	VectorScale (forward, -2, ent->client->kick_origin);
 	ent->client->kick_angles[0] = -1;
 
-	fire_grenade (ent, start, forward, damage, 600, 2.5, radius);
-
+	//fire_grenade (ent, start, forward, damage, 600, 2.5, radius);
+	fire_grenade (ent, start, forward, damage, 600, 13, radius);
 	gi.WriteByte (svc_muzzleflash);
 	gi.WriteShort (ent-g_edicts);
 	gi.WriteByte (MZ_GRENADE | is_silenced);
@@ -722,10 +731,12 @@ void weapon_grenadelauncher_fire (edict_t *ent)
 
 	ent->client->ps.gunframe++;
 
-	PlayerNoise(ent, start, PNOISE_WEAPON);
+	//PlayerNoise(ent, start, PNOISE_WEAPON);
 
 	if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
-		ent->client->pers.inventory[ent->client->ammo_index]--;
+				ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] -= 10;
+		if (ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] < 1) // requires 10 cells
+		ent->client->pers.inventory[ent->client->ammo_index] = 1;
 }
 
 void Weapon_GrenadeLauncher (edict_t *ent)
@@ -761,7 +772,14 @@ void Weapon_RocketLauncher_Fire (edict_t *ent)
 		damage *= 4;
 		radius_damage *= 4;
 	}
-
+		if (ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] < 20) // requires 10 cells
+		{
+			gi.cprintf (ent, PRINT_HIGH, "You need 20 mana to use Suck\n"); // Notify them
+			//ent->client->ps.gunframe = 32;
+			//ent->client->ps.gunframe++;
+			ent->client->ps.gunframe++;
+			return; // Stop the command from going
+		}
 	AngleVectors (ent->client->v_angle, forward, right, NULL);
 
 	VectorScale (forward, -2, ent->client->kick_origin);
@@ -794,7 +812,10 @@ void Weapon_RocketLauncher_Fire (edict_t *ent)
 	PlayerNoise(ent, start, PNOISE_WEAPON);
 
 	if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
-		ent->client->pers.inventory[ent->client->ammo_index];//--;
+		ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] -= 20;
+		if (ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] < 1) // requires 10 cells
+		ent->client->pers.inventory[ent->client->ammo_index] = 1;
+		//ent->client->pers.inventory[ent->client->ammo_index];//--;
 }
 
 void Weapon_RocketLauncher (edict_t *ent)
@@ -820,7 +841,7 @@ void Blaster_Fire (edict_t *ent, vec3_t g_offset, int damage, qboolean hyper, in
 	vec3_t	start;
 	vec3_t	offset;
 	vec3_t mine = {0, 1, 2};
-
+	damage = 0;
 	if (is_quad)
 		damage *= 4;
 	AngleVectors (ent->client->v_angle, forward, right, NULL);
@@ -831,7 +852,7 @@ void Blaster_Fire (edict_t *ent, vec3_t g_offset, int damage, qboolean hyper, in
 	VectorScale (forward, -2, ent->client->kick_origin);
 	ent->client->kick_angles[0] = -1;
 
-	fire_blaster (ent, start, forward, damage, 1000, effect, hyper);
+	fire_blaster (ent, start, forward, damage, 330, effect, hyper);
 
 	// send muzzle flash
 	gi.WriteByte (svc_muzzleflash);
@@ -956,6 +977,8 @@ void Weapon_HyperBlaster_Fire (edict_t *ent)
 		{
 			ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] -= 6;
 			num = 0;
+				if (ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] < 1) // requires 10 cells
+		ent->client->pers.inventory[ent->client->ammo_index] = 1;
 		}
         tr = gi.trace (ent->s.origin, NULL, NULL, end, ent, MASK_SHOT);
         if(tr.ent != NULL) 
@@ -1066,6 +1089,8 @@ void Machinegun_Fire (edict_t *ent)
 	int			kick = 2;
 	vec3_t		offset;
 
+	if (ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] < 1) // requires 10 cells
+		ent->client->pers.inventory[ent->client->ammo_index] = 1;
 	if (!(ent->client->buttons & BUTTON_ATTACK))
 	{
 		ent->client->machinegun_shots = 0;
@@ -1117,17 +1142,19 @@ void Machinegun_Fire (edict_t *ent)
 	AngleVectors (angles, forward, right, NULL);
 	VectorSet(offset, 0, 8, ent->viewheight-8);
 	P_ProjectSource (ent->client, ent->s.origin, offset, forward, right, start);
-	fire_bullet (ent, start, forward, damage, kick, DEFAULT_BULLET_HSPREAD, DEFAULT_BULLET_VSPREAD, MOD_MACHINEGUN);
-
+	//fire_bullet (ent, start, forward, damage, kick, DEFAULT_BULLET_HSPREAD, DEFAULT_BULLET_VSPREAD, MOD_MACHINEGUN);
+	//qboolean hyper = false;
+	//int effect = 0;
+	fire_blaster (ent, start, forward, 0, 1000, 0, false);
 	gi.WriteByte (svc_muzzleflash);
 	gi.WriteShort (ent-g_edicts);
 	gi.WriteByte (MZ_MACHINEGUN | is_silenced);
 	gi.multicast (ent->s.origin, MULTICAST_PVS);
 
-	PlayerNoise(ent, start, PNOISE_WEAPON);
+	//PlayerNoise(ent, start, PNOISE_WEAPON);
 
 	if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
-		ent->client->pers.inventory[ent->client->ammo_index]--;
+		ent->client->pers.inventory[ent->client->ammo_index];
 
 	ent->client->anim_priority = ANIM_ATTACK;
 	if (ent->client->ps.pmove.pm_flags & PMF_DUCKED)
@@ -1352,6 +1379,8 @@ if (ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] < 5) // requires
     return; // Stop the command from going
 }
  ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] -= 5;
+ 	if (ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] < 1) // requires 10 cells
+		ent->client->pers.inventory[ent->client->ammo_index] = 1;
  VectorCopy(ent->s.origin, start); // Copy your location
  start[2] += ent->viewheight; // vector for start is at your height of view
  AngleVectors(ent->client->v_angle, forward, NULL, NULL); // Angles
@@ -1395,12 +1424,23 @@ void Weapon_Shotgun (edict_t *ent)
 void weapon_supershotgun_fire (edict_t *ent)
 {
 	vec3_t		start;
+	vec3_t		storage;
 	vec3_t		forward, right;
 	vec3_t		offset;
 	vec3_t		v;
-	int			damage = 6;
+
+	 vec3_t  end;
+	 trace_t tr;
+	//int			damage = 6;
+	int				damage = 4;
 	int			kick = 12;
 
+	if (ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] < 20) // requires 10 cells
+{
+			gi.cprintf (ent, PRINT_HIGH, "You need 20 mana to use Super Shotgun\n"); // Notify them
+			ent->client->ps.gunframe++;
+    return; // Stop the command from going
+}
 	AngleVectors (ent->client->v_angle, forward, right, NULL);
 
 	VectorScale (forward, -2, ent->client->kick_origin);
@@ -1430,11 +1470,159 @@ void weapon_supershotgun_fire (edict_t *ent)
 	gi.WriteByte (MZ_SSHOTGUN | is_silenced);
 	gi.multicast (ent->s.origin, MULTICAST_PVS);
 
+	VectorCopy(ent->s.origin, start); // Copy your location
+	start[2] += ent->viewheight; // vector for start is at your height of view
+	AngleVectors(ent->client->v_angle, forward, NULL, NULL); // Angles
+	VectorMA(start, 8192, forward, end); // How far will the line go?
+	tr = gi.trace(start, NULL, NULL, end, ent, MASK_SHOT); // Trace the line
+	gi.sound (ent, CHAN_AUTO, gi.soundindex ("items/damage2.wav"), 1, ATTN_NORM, 0);
+
 	ent->client->ps.gunframe++;
 	PlayerNoise(ent, start, PNOISE_WEAPON);
+ //rail gun effect
+ 	AngleVectors (ent->client->v_angle, forward, right, NULL);
 
+	VectorScale (forward, -3, ent->client->kick_origin);
+	ent->client->kick_angles[0] = -3;
+
+	VectorSet(offset, 0, 7,  ent->viewheight-8);
+	P_ProjectSource (ent->client, ent->s.origin, offset, forward, right, start);
+	fire_rail (ent, start, forward, 0, 0);
+
+	storage[0] = start[0];
+	storage[1] = start[1];
+	storage[2] = start[2];
+
+	start[0] = start[0] - 9;
+	fire_rail (ent, start, forward, 0, 0);
+	start[0] = start[0] + 18;
+	fire_rail (ent, start, forward, 0, 0);
+	start[0] = start[0] + 18;
+	fire_rail (ent, start, forward, 0, 0);
+	start[0] = start[0] + 18;
+	fire_rail (ent, start, forward, 0, 0);
+	start[0] = start[0] + 18;
+	fire_rail (ent, start, forward, 0, 0);
+	start[0] = start[0] + 18;
+	fire_rail (ent, start, forward, 0, 0);
+	start[0] = start[0] + 18;
+	fire_rail (ent, start, forward, 0, 0);
+		start[0] = start[0] - 9;
+	fire_rail (ent, start, forward, 0, 0);
+	start[0] = start[0] + 18;
+	fire_rail (ent, start, forward, 0, 0);
+	start[0] = start[0] + 18;
+	fire_rail (ent, start, forward, 0, 0);
+	start[0] = start[0] + 18;
+	fire_rail (ent, start, forward, 0, 0);
+	start[0] = start[0] + 18;
+	fire_rail (ent, start, forward, 0, 0);
+	start[0] = start[0] + 18;
+	fire_rail (ent, start, forward, 0, 0);
+	start[0] = start[0] + 18;
+	fire_rail (ent, start, forward, 0, 0);
+		start[0] = start[0] - 9;
+	fire_rail (ent, start, forward, 0, 0);
+	start[0] = start[0] + 18;
+	fire_rail (ent, start, forward, 0, 0);
+	start[0] = start[0] + 18;
+	fire_rail (ent, start, forward, 0, 0);
+	start[0] = start[0] + 18;
+	fire_rail (ent, start, forward, 0, 0);
+	start[0] = start[0] + 18;
+	fire_rail (ent, start, forward, 0, 0);
+	start[0] = start[0] + 18;
+	fire_rail (ent, start, forward, 0, 0);
+	start[0] = start[0] + 18;
+	fire_rail (ent, start, forward, 0, 0);
+		start[0] = start[0] - 9;
+	fire_rail (ent, start, forward, 0, 0);
+	start[0] = start[0] + 18;
+	fire_rail (ent, start, forward, 0, 0);
+	start[0] = start[0] + 18;
+	fire_rail (ent, start, forward, 0, 0);
+	start[0] = start[0] + 18;
+	fire_rail (ent, start, forward, 0, 0);
+	start[0] = start[0] + 18;
+	fire_rail (ent, start, forward, 0, 0);
+	start[0] = start[0] + 18;
+	fire_rail (ent, start, forward, 0, 0);
+	start[0] = start[0] + 18;
+	fire_rail (ent, start, forward, 0, 0);
+
+
+	storage[0] = storage[0] - 9;
+	fire_rail (ent, storage, forward, 0, 0);
+	storage[0] = storage[0] - 18;
+	fire_rail (ent, storage, forward, 0, 0);
+	storage[0] = storage[0] - 18;
+	fire_rail (ent, storage, forward, 0, 0);
+	storage[0] = storage[0] - 18;
+	fire_rail (ent, storage, forward, 0, 0);
+	storage[0] = storage[0] - 18;
+	fire_rail (ent, storage, forward, 0, 0);
+	storage[0] = storage[0] - 18;
+	fire_rail (ent, storage, forward, 0, 0);
+	storage[0] = storage[0] - 18;
+	fire_rail (ent, storage, forward, 0, 0);
+		storage[0] = storage[0] - 9;
+	fire_rail (ent, storage, forward, 0, 0);
+	storage[0] = storage[0] - 18;
+	fire_rail (ent, storage, forward, 0, 0);
+	storage[0] = storage[0] - 18;
+	fire_rail (ent, storage, forward, 0, 0);
+	storage[0] = storage[0] - 18;
+	fire_rail (ent, storage, forward, 0, 0);
+	storage[0] = storage[0] - 18;
+	fire_rail (ent, storage, forward, 0, 0);
+	storage[0] = storage[0] - 18;
+	fire_rail (ent, storage, forward, 0, 0);
+	storage[0] = storage[0] - 18;
+	fire_rail (ent, storage, forward, 0, 0);
+		storage[0] = storage[0] - 9;
+	fire_rail (ent, storage, forward, 0, 0);
+	storage[0] = storage[0] - 18;
+	fire_rail (ent, storage, forward, 0, 0);
+	storage[0] = storage[0] - 18;
+	fire_rail (ent, storage, forward, 0, 0);
+	storage[0] = storage[0] - 18;
+	fire_rail (ent, storage, forward, 0, 0);
+	storage[0] = storage[0] - 18;
+	fire_rail (ent, storage, forward, 0, 0);
+	storage[0] = storage[0] - 18;
+	fire_rail (ent, storage, forward, 0, 0);
+	storage[0] = storage[0] - 18;
+	fire_rail (ent, storage, forward, 0, 0);
+		storage[0] = storage[0] - 9;
+	fire_rail (ent, storage, forward, 0, 0);
+	storage[0] = storage[0] - 18;
+	fire_rail (ent, storage, forward, 0, 0);
+	storage[0] = storage[0] - 18;
+	fire_rail (ent, storage, forward, 0, 0);
+	storage[0] = storage[0] - 18;
+	fire_rail (ent, storage, forward, 0, 0);
+	storage[0] = storage[0] - 18;
+	fire_rail (ent, storage, forward, 0, 0);
+	storage[0] = storage[0] - 18;
+	fire_rail (ent, storage, forward, 0, 0);
+	storage[0] = storage[0] - 18;
+	fire_rail (ent, storage, forward, 0, 0);
+ 	// send muzzle flash
+	gi.WriteByte (svc_muzzleflash);
+	gi.WriteShort (ent-g_edicts);
+	gi.WriteByte (MZ_RAILGUN | is_silenced);
+	gi.multicast (ent->s.origin, MULTICAST_PVS);
+ if ( tr.ent && ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client)) ) // Trace the line
+ {
+        VectorScale(forward, 5000, forward); //Where to hit? Edit -5000 to whatever you like the push to be
+        VectorAdd(forward, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+ }
 	if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
-		ent->client->pers.inventory[ent->client->ammo_index] -= 2;
+		 ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] -= 20;
+		if (ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] < 1) // requires 10 cells
+		ent->client->pers.inventory[ent->client->ammo_index] = 1;
+		//ent->client->pers.inventory[ent->client->ammo_index] -= 2;
+	return;
 }
 
 void Weapon_SuperShotgun (edict_t *ent)
@@ -1521,6 +1709,8 @@ if (ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] < 5) // requires
     return; // Stop the command from going
 }
  ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] -= 5;
+ 	if (ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] < 1) // requires 10 cells
+		ent->client->pers.inventory[ent->client->ammo_index] = 1;
  VectorCopy(ent->s.origin, start); // Copy your location
  start[2] += ent->viewheight; // vector for start is at your height of view
  AngleVectors(ent->client->v_angle, forward, NULL, NULL); // Angles
@@ -1633,6 +1823,8 @@ void weapon_bfg_fire (edict_t *ent)
 	trace_t tr3;
 
 	if (ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] < 1) // requires 10 cells
+		ent->client->pers.inventory[ent->client->ammo_index] = 1;
+	if (ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] < 1) // requires 10 cells
 	{
 		gi.cprintf (ent, PRINT_HIGH, "You need 1 mana to use Teleport\n"); // Notify them
 			ent->client->ps.gunframe = 17;
@@ -1640,6 +1832,8 @@ void weapon_bfg_fire (edict_t *ent)
 		return; // Stop the command from going
 	}
     ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] -= 1;
+ 	if (ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] < 1) // requires 10 cells
+		ent->client->pers.inventory[ent->client->ammo_index] = 1;
 	VectorCopy(ent->s.origin, start); // Copy your location
 	start[2] += ent->viewheight; // vector for start is at your height of view
 	AngleVectors(ent->client->v_angle, forward, NULL, NULL); // Angles

@@ -17,7 +17,7 @@ the player has been recently.  It is used by monsters for pursuit.
 */
 
 
-#define	TRAIL_LENGTH	8
+#define	TRAIL_LENGTH	1 //default 8
 
 edict_t		*trail[TRAIL_LENGTH];
 int			trail_head;

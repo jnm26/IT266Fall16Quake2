@@ -157,7 +157,7 @@ typedef enum
 #define SFL_CROSS_TRIGGER_MASK	0x000000ff
 
 
-// noise types for PlayerNoise
+// noise types for PlayerNoise //johnnyb
 #define PNOISE_SELF				0
 #define PNOISE_WEAPON			1
 #define PNOISE_IMPACT			2
@@ -480,7 +480,7 @@ extern	int	body_armor_index;
 #define MOD_HIT				32
 #define MOD_TARGET_BLASTER	33
 #define MOD_FRIENDLY_FIRE	0x8000000
-
+#define MOD_PUNCH			34 //johnnyb
 extern	int	meansOfDeath;
 
 
@@ -715,6 +715,7 @@ void fire_grenade2 (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int 
 void fire_rocket (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed, float damage_radius, int radius_damage);
 void fire_rail (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int kick);
 void fire_bfg (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed, float damage_radius);
+void parasite_drain_attack2 (edict_t *self);
 
 //
 // g_ptrail.c
@@ -941,6 +942,7 @@ struct gclient_s
 
 	edict_t		*chase_target;		// player we are chasing
 	qboolean	update_chase;		// need to update chase info?
+	int ClassSpeed; //johnnyb
 };
 
 

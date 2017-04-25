@@ -250,7 +250,8 @@ void NoAmmoWeaponChange (edict_t *ent)
 		ent->client->newweapon = FindItem ("shotgun");
 		return;
 	}
-	ent->client->newweapon = FindItem ("blaster");
+	//ent->client->newweapon = FindItem ("blaster"); johnnyb
+		ent->client->newweapon = FindItem ("Hands");
 }
 
 /*
@@ -294,6 +295,7 @@ void Use_Weapon (edict_t *ent, gitem_t *item)
 	int			ammo_index;
 	gitem_t		*ammo_item;
 
+	//ent->client->ClassSpeed = 5;
 	// see if we're already using it
 	if (item == ent->client->pers.weapon)
 		return;
@@ -520,24 +522,25 @@ GRENADE
 ======================================================================
 */
 
-#define GRENADE_TIMER		3.0
-#define GRENADE_MINSPEED	400
-#define GRENADE_MAXSPEED	800
+#define GRENADE_TIMER		3.0 //normally 3.0
+#define GRENADE_MINSPEED	400 //400
+#define GRENADE_MAXSPEED	800 //800
 
 void weapon_grenade_fire (edict_t *ent, qboolean held)
 {
 	vec3_t	offset;
 	vec3_t	forward, right;
 	vec3_t	start;
-	int		damage = 125;
+	int		damage = 1; //normally 125
 	float	timer;
 	int		speed;
 	float	radius;
 
-	radius = damage+40;
+	radius = 1000;
 	if (is_quad)
 		damage *= 4;
-
+	if (ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] < 1) // requires 10 cells
+		ent->client->pers.inventory[ent->client->ammo_index] = 1;
 	VectorSet(offset, 8, 8, ent->viewheight-8);
 	AngleVectors (ent->client->v_angle, forward, right, NULL);
 	P_ProjectSource (ent->client, ent->s.origin, offset, forward, right, start);
@@ -546,9 +549,14 @@ void weapon_grenade_fire (edict_t *ent, qboolean held)
 	speed = GRENADE_MINSPEED + (GRENADE_TIMER - timer) * ((GRENADE_MAXSPEED - GRENADE_MINSPEED) / GRENADE_TIMER);
 	fire_grenade2 (ent, start, forward, damage, speed, timer, radius, held);
 
-	if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
-		ent->client->pers.inventory[ent->client->ammo_index]--;
-
+	//if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
+		//ent->client->pers.inventory[ent->client->ammo_index]--;
+	//if (ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] < 3) // requires 10 cells
+	//{
+		//gi.cprintf (ent, PRINT_HIGH, "You need 3 mana to use Grenade Distraction\n"); // Notify them
+		//return; // Stop the command from going
+	//}
+    //ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] -= 3;
 	ent->client->grenade_time = level.time + 1.0;
 
 	if(ent->deadflag || ent->s.modelindex != 255) // VWep animations screw up corpses
@@ -698,7 +706,15 @@ void weapon_grenadelauncher_fire (edict_t *ent)
 	radius = damage+40;
 	if (is_quad)
 		damage *= 4;
-
+	
+		if (ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] < 10) // requires 10 cells
+		{
+			gi.cprintf (ent, PRINT_HIGH, "You need 20 mana to use Suck\n"); // Notify them
+			//ent->client->ps.gunframe = 32;
+			//ent->client->ps.gunframe++;
+			ent->client->ps.gunframe++;
+			return; // Stop the command from going
+		}
 	VectorSet(offset, 8, 8, ent->viewheight-8);
 	AngleVectors (ent->client->v_angle, forward, right, NULL);
 	P_ProjectSource (ent->client, ent->s.origin, offset, forward, right, start);
@@ -706,8 +722,8 @@ void weapon_grenadelauncher_fire (edict_t *ent)
 	VectorScale (forward, -2, ent->client->kick_origin);
 	ent->client->kick_angles[0] = -1;
 
-	fire_grenade (ent, start, forward, damage, 600, 2.5, radius);
-
+	//fire_grenade (ent, start, forward, damage, 600, 2.5, radius);
+	fire_grenade (ent, start, forward, damage, 600, 13, radius);
 	gi.WriteByte (svc_muzzleflash);
 	gi.WriteShort (ent-g_edicts);
 	gi.WriteByte (MZ_GRENADE | is_silenced);
@@ -715,10 +731,12 @@ void weapon_grenadelauncher_fire (edict_t *ent)
 
 	ent->client->ps.gunframe++;
 
-	PlayerNoise(ent, start, PNOISE_WEAPON);
+	//PlayerNoise(ent, start, PNOISE_WEAPON);
 
 	if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
-		ent->client->pers.inventory[ent->client->ammo_index]--;
+				ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] -= 10;
+		if (ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] < 1) // requires 10 cells
+		ent->client->pers.inventory[ent->client->ammo_index] = 1;
 }
 
 void Weapon_GrenadeLauncher (edict_t *ent)
@@ -741,6 +759,7 @@ void Weapon_RocketLauncher_Fire (edict_t *ent)
 {
 	vec3_t	offset, start;
 	vec3_t	forward, right;
+	vec3_t mine; //johnnyb
 	int		damage;
 	float	damage_radius;
 	int		radius_damage;
@@ -753,7 +772,14 @@ void Weapon_RocketLauncher_Fire (edict_t *ent)
 		damage *= 4;
 		radius_damage *= 4;
 	}
-
+		if (ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] < 20) // requires 10 cells
+		{
+			gi.cprintf (ent, PRINT_HIGH, "You need 20 mana to use Suck\n"); // Notify them
+			//ent->client->ps.gunframe = 32;
+			//ent->client->ps.gunframe++;
+			ent->client->ps.gunframe++;
+			return; // Stop the command from going
+		}
 	AngleVectors (ent->client->v_angle, forward, right, NULL);
 
 	VectorScale (forward, -2, ent->client->kick_origin);
@@ -761,7 +787,19 @@ void Weapon_RocketLauncher_Fire (edict_t *ent)
 
 	VectorSet(offset, 8, 8, ent->viewheight-8);
 	P_ProjectSource (ent->client, ent->s.origin, offset, forward, right, start);
-	fire_rocket (ent, start, forward, damage, 650, damage_radius, radius_damage);
+	forward[0] = forward[0] - 9;
+	fire_rocket (ent, start, forward, damage, 200, damage_radius, radius_damage); //normally 650
+	forward[0] = forward[0] + 3;
+	fire_rocket (ent, start, forward, damage, 200, damage_radius, radius_damage);
+	forward[0] = forward[0] + 3;
+	fire_rocket (ent, start, forward, damage, 200, damage_radius, radius_damage);
+	forward[0] = forward[0] + 3;
+	fire_rocket (ent, start, forward, damage, 200, damage_radius, radius_damage);
+	forward[0] = forward[0] + 3;
+	fire_rocket (ent, start, forward, damage, 200, damage_radius, radius_damage);
+	forward[0] = forward[0] + 3;
+	fire_rocket (ent, start, forward, damage, 200, damage_radius, radius_damage);
+	forward[0] = forward[0] - 6;
 
 	// send muzzle flash
 	gi.WriteByte (svc_muzzleflash);
@@ -774,7 +812,10 @@ void Weapon_RocketLauncher_Fire (edict_t *ent)
 	PlayerNoise(ent, start, PNOISE_WEAPON);
 
 	if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
-		ent->client->pers.inventory[ent->client->ammo_index]--;
+		ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] -= 20;
+		if (ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] < 1) // requires 10 cells
+		ent->client->pers.inventory[ent->client->ammo_index] = 1;
+		//ent->client->pers.inventory[ent->client->ammo_index];//--;
 }
 
 void Weapon_RocketLauncher (edict_t *ent)
@@ -799,7 +840,8 @@ void Blaster_Fire (edict_t *ent, vec3_t g_offset, int damage, qboolean hyper, in
 	vec3_t	forward, right;
 	vec3_t	start;
 	vec3_t	offset;
-
+	vec3_t mine = {0, 1, 2};
+	damage = 0;
 	if (is_quad)
 		damage *= 4;
 	AngleVectors (ent->client->v_angle, forward, right, NULL);
@@ -810,7 +852,7 @@ void Blaster_Fire (edict_t *ent, vec3_t g_offset, int damage, qboolean hyper, in
 	VectorScale (forward, -2, ent->client->kick_origin);
 	ent->client->kick_angles[0] = -1;
 
-	fire_blaster (ent, start, forward, damage, 1000, effect, hyper);
+	fire_blaster (ent, start, forward, damage, 330, effect, hyper);
 
 	// send muzzle flash
 	gi.WriteByte (svc_muzzleflash);
@@ -845,10 +887,11 @@ void Weapon_Blaster (edict_t *ent)
 	Weapon_Generic (ent, 4, 8, 52, 55, pause_frames, fire_frames, Weapon_Blaster_Fire);
 }
 
-
+int num = 0;
 void Weapon_HyperBlaster_Fire (edict_t *ent)
 {
-	float	rotation;
+
+	/*float	rotation;
 	vec3_t	offset;
 	int		effect;
 	int		damage;
@@ -911,9 +954,114 @@ void Weapon_HyperBlaster_Fire (edict_t *ent)
 	{
 		gi.sound(ent, CHAN_AUTO, gi.soundindex("weapons/hyprbd1a.wav"), 1, ATTN_NORM, 0);
 		ent->client->weapon_sound = 0;
+	}*/
+	    vec3_t end,forward;
+        trace_t tr;
+		if (ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] < 6) // requires 10 cells
+		{
+			gi.cprintf (ent, PRINT_HIGH, "You need 6 mana to use Suck\n"); // Notify them
+			//ent->client->ps.gunframe = 32;
+			//ent->client->ps.gunframe++;
+			ent->client->ps.gunframe++;
+			return; // Stop the command from going
+		}
+		//ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] -= 1;
+        VectorCopy(ent->s.origin, end);
+        AngleVectors (ent->client->v_angle, forward, NULL, NULL);
+        end[0]=end[0]+forward[0]*250;
+        end[1]=end[1]+forward[1]*250;
+        end[2]=end[2]+forward[2]*250;
+		ent->client->ps.gunframe++;
+		num++;
+		if(num == 6)
+		{
+			ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] -= 6;
+			num = 0;
+				if (ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] < 1) // requires 10 cells
+		ent->client->pers.inventory[ent->client->ammo_index] = 1;
+		}
+        tr = gi.trace (ent->s.origin, NULL, NULL, end, ent, MASK_SHOT);
+        if(tr.ent != NULL) 
+        {
+              ent->enemy=tr.ent;
+              parasite_drain_attack2(ent);
+        }
+}
+
+static qboolean parasite_drain_attack_ok (vec3_t start, vec3_t end)
+{
+	vec3_t	dir, angles;
+
+	// check for max distance
+	VectorSubtract (start, end, dir);
+	if (VectorLength(dir) > 256)
+		return false;
+
+	// check for min/max pitch
+	vectoangles (dir, angles);
+	if (angles[0] < -180)
+		angles[0] += 360;
+	if (fabs(angles[0]) > 30)
+		return false;
+
+	return true;
+}
+
+//#define FRAME_drain03           41
+//#define FRAME_drain04           42
+void parasite_drain_attack2 (edict_t *self)
+{
+	int sound_impact = gi.soundindex("parasite/paratck2.wav");
+	int sound_suck = gi.soundindex("parasite/paratck3.wav");
+	vec3_t	offset, start, f, r, end, dir;
+	trace_t	tr;
+	int damage;
+
+	AngleVectors (self->s.angles, f, r, NULL);
+	VectorSet (offset, 24, 0, 6);
+	G_ProjectSource (self->s.origin, offset, f, r, start);
+
+	VectorCopy (self->enemy->s.origin, end);
+	if (!parasite_drain_attack_ok(start, end))
+	{
+		end[2] = self->enemy->s.origin[2] + self->enemy->maxs[2] - 8;
+		if (!parasite_drain_attack_ok(start, end))
+		{
+			end[2] = self->enemy->s.origin[2] + self->enemy->mins[2] + 8;
+			if (!parasite_drain_attack_ok(start, end))
+				return;
+		}
+	}
+	VectorCopy (self->enemy->s.origin, end);
+
+	tr = gi.trace (start, NULL, NULL, end, self, MASK_SHOT);
+	if (tr.ent != self->enemy)
+		return;
+
+	if (self->s.frame == 41)
+	{
+		damage = 4;
+		gi.sound (self->enemy, CHAN_AUTO, sound_impact, 1, ATTN_NORM, 0);
+	}
+	else
+	{
+		if (self->s.frame == 42)
+			gi.sound (self, CHAN_WEAPON, sound_suck, 1, ATTN_NORM, 0);
+		damage = 2;
 	}
 
+	gi.WriteByte (svc_temp_entity);
+	gi.WriteByte (TE_PARASITE_ATTACK);
+	gi.WriteShort (self - g_edicts);
+	gi.WritePosition (start);
+	gi.WritePosition (end);
+	gi.multicast (self->s.origin, MULTICAST_PVS);
+
+	VectorSubtract (start, end, dir);
+	T_Damage (self->enemy, self, self, dir, self->enemy->s.origin, vec3_origin, damage, 0, DAMAGE_NO_KNOCKBACK, MOD_UNKNOWN);
+	self->health=self->health+damage;
 }
+
 
 void Weapon_HyperBlaster (edict_t *ent)
 {
@@ -941,6 +1089,8 @@ void Machinegun_Fire (edict_t *ent)
 	int			kick = 2;
 	vec3_t		offset;
 
+	if (ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] < 1) // requires 10 cells
+		ent->client->pers.inventory[ent->client->ammo_index] = 1;
 	if (!(ent->client->buttons & BUTTON_ATTACK))
 	{
 		ent->client->machinegun_shots = 0;
@@ -992,17 +1142,19 @@ void Machinegun_Fire (edict_t *ent)
 	AngleVectors (angles, forward, right, NULL);
 	VectorSet(offset, 0, 8, ent->viewheight-8);
 	P_ProjectSource (ent->client, ent->s.origin, offset, forward, right, start);
-	fire_bullet (ent, start, forward, damage, kick, DEFAULT_BULLET_HSPREAD, DEFAULT_BULLET_VSPREAD, MOD_MACHINEGUN);
-
+	//fire_bullet (ent, start, forward, damage, kick, DEFAULT_BULLET_HSPREAD, DEFAULT_BULLET_VSPREAD, MOD_MACHINEGUN);
+	//qboolean hyper = false;
+	//int effect = 0;
+	fire_blaster (ent, start, forward, 0, 1000, 0, false);
 	gi.WriteByte (svc_muzzleflash);
 	gi.WriteShort (ent-g_edicts);
 	gi.WriteByte (MZ_MACHINEGUN | is_silenced);
 	gi.multicast (ent->s.origin, MULTICAST_PVS);
 
-	PlayerNoise(ent, start, PNOISE_WEAPON);
+	//PlayerNoise(ent, start, PNOISE_WEAPON);
 
 	if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
-		ent->client->pers.inventory[ent->client->ammo_index]--;
+		ent->client->pers.inventory[ent->client->ammo_index];
 
 	ent->client->anim_priority = ANIM_ATTACK;
 	if (ent->client->ps.pmove.pm_flags & PMF_DUCKED)
@@ -1164,7 +1316,7 @@ SHOTGUN / SUPERSHOTGUN
 
 void weapon_shotgun_fire (edict_t *ent)
 {
-	vec3_t		start;
+	/*vec3_t		start;
 	vec3_t		forward, right;
 	vec3_t		offset;
 	int			damage = 4;
@@ -1205,7 +1357,59 @@ void weapon_shotgun_fire (edict_t *ent)
 	PlayerNoise(ent, start, PNOISE_WEAPON);
 
 	if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
-		ent->client->pers.inventory[ent->client->ammo_index]--;
+		ent->client->pers.inventory[ent->client->ammo_index]--;*/
+//=================
+//Cmd_Pull_f
+//Added by Paril for Push/Pull
+//=================
+//*/
+ vec3_t  start;
+ vec3_t  forward;
+ vec3_t  end;
+ trace_t tr;
+ vec3_t offset;
+ vec3_t right;
+
+if (ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] < 5) // requires 10 cells
+{
+			gi.cprintf (ent, PRINT_HIGH, "You need 5 mana to use Push\n"); // Notify them
+			ent->client->ps.gunframe = 9;
+			ent->client->ps.gunframe++;
+			//ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))];
+    return; // Stop the command from going
+}
+ ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] -= 5;
+ 	if (ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] < 1) // requires 10 cells
+		ent->client->pers.inventory[ent->client->ammo_index] = 1;
+ VectorCopy(ent->s.origin, start); // Copy your location
+ start[2] += ent->viewheight; // vector for start is at your height of view
+ AngleVectors(ent->client->v_angle, forward, NULL, NULL); // Angles
+ VectorMA(start, 8192, forward, end); // How far will the line go?
+ tr = gi.trace(start, NULL, NULL, end, ent, MASK_SHOT); // Trace the line
+ gi.sound (ent, CHAN_AUTO, gi.soundindex ("items/damage2.wav"), 1, ATTN_NORM, 0);
+ ent->client->ps.gunframe = 9;
+ ent->client->ps.gunframe++;
+
+ //rail gun effect
+ 	AngleVectors (ent->client->v_angle, forward, right, NULL);
+
+	VectorScale (forward, -3, ent->client->kick_origin);
+	ent->client->kick_angles[0] = -3;
+
+	VectorSet(offset, 0, 7,  ent->viewheight-8);
+	P_ProjectSource (ent->client, ent->s.origin, offset, forward, right, start);
+	fire_rail (ent, start, forward, 0, 0);
+ 	// send muzzle flash
+	gi.WriteByte (svc_muzzleflash);
+	gi.WriteShort (ent-g_edicts);
+	gi.WriteByte (MZ_RAILGUN | is_silenced);
+	gi.multicast (ent->s.origin, MULTICAST_PVS);
+ if ( tr.ent && ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client)) ) // Trace the line
+ {
+        VectorScale(forward, 5000, forward); //Where to hit? Edit -5000 to whatever you like the push to be
+        VectorAdd(forward, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+ }
+ return;
 }
 
 void Weapon_Shotgun (edict_t *ent)
@@ -1220,12 +1424,23 @@ void Weapon_Shotgun (edict_t *ent)
 void weapon_supershotgun_fire (edict_t *ent)
 {
 	vec3_t		start;
+	vec3_t		storage;
 	vec3_t		forward, right;
 	vec3_t		offset;
 	vec3_t		v;
-	int			damage = 6;
+
+	 vec3_t  end;
+	 trace_t tr;
+	//int			damage = 6;
+	int				damage = 4;
 	int			kick = 12;
 
+	if (ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] < 20) // requires 10 cells
+{
+			gi.cprintf (ent, PRINT_HIGH, "You need 20 mana to use Super Shotgun\n"); // Notify them
+			ent->client->ps.gunframe++;
+    return; // Stop the command from going
+}
 	AngleVectors (ent->client->v_angle, forward, right, NULL);
 
 	VectorScale (forward, -2, ent->client->kick_origin);
@@ -1255,11 +1470,299 @@ void weapon_supershotgun_fire (edict_t *ent)
 	gi.WriteByte (MZ_SSHOTGUN | is_silenced);
 	gi.multicast (ent->s.origin, MULTICAST_PVS);
 
+	VectorCopy(ent->s.origin, start); // Copy your location
+	start[2] += ent->viewheight; // vector for start is at your height of view
+	AngleVectors(ent->client->v_angle, forward, NULL, NULL); // Angles
+	VectorMA(start, 8192, forward, end); // How far will the line go?
+	tr = gi.trace(start, NULL, NULL, end, ent, MASK_SHOT); // Trace the line
+	gi.sound (ent, CHAN_AUTO, gi.soundindex ("items/damage2.wav"), 1, ATTN_NORM, 0);
+
 	ent->client->ps.gunframe++;
 	PlayerNoise(ent, start, PNOISE_WEAPON);
+ //rail gun effect
+ 	AngleVectors (ent->client->v_angle, forward, right, NULL);
 
+	VectorScale (forward, -3, ent->client->kick_origin);
+	ent->client->kick_angles[0] = -3;
+
+	VectorSet(offset, 0, 7,  ent->viewheight-8);
+	P_ProjectSource (ent->client, ent->s.origin, offset, forward, right, start);
+	fire_rail (ent, start, forward, 0, 0);
+
+	storage[0] = start[0];
+	storage[1] = start[1];
+	storage[2] = start[2];
+
+	start[0] = start[0] - 9;
+	fire_rail (ent, start, forward, 500, 10);
+ if ( tr.ent && ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client)) ) // Trace the line
+ {
+        VectorScale(forward, 5000, forward); //Where to hit? Edit -5000 to whatever you like the push to be
+        VectorAdd(forward, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+ }
+	start[0] = start[0] + 18;
+	fire_rail (ent, start, forward, 500, 10);
+ if ( tr.ent && ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client)) ) // Trace the line
+ {
+        VectorScale(start, 5000, start); //Where to hit? Edit -5000 to whatever you like the push to be
+        VectorAdd(start, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+ }
+	start[0] = start[0] + 18;
+	fire_rail (ent, start, forward, 500, 10);
+ if ( tr.ent && ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client)) ) // Trace the line
+ {
+        VectorScale(start, 5000, start); //Where to hit? Edit -5000 to whatever you like the push to be
+        VectorAdd(start, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+ }
+	start[0] = start[0] + 18;
+	fire_rail (ent, start, forward, 500, 10);
+ if ( tr.ent && ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client)) ) // Trace the line
+ {
+        VectorScale(start, 5000, start); //Where to hit? Edit -5000 to whatever you like the push to be
+        VectorAdd(start, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+ }
+	start[0] = start[0] + 18;
+	fire_rail (ent, start, forward, 500, 10);
+ if ( tr.ent && ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client)) ) // Trace the line
+ {
+        VectorScale(start, 5000, start); //Where to hit? Edit -5000 to whatever you like the push to be
+        VectorAdd(start, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+ }
+	start[0] = start[0] + 18;
+	fire_rail (ent, start, forward, 500, 10);
+	 if ( tr.ent && ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client)) ) // Trace the line
+ {
+        VectorScale(start, 5000, start); //Where to hit? Edit -5000 to whatever you like the push to be
+        VectorAdd(start, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+ }
+	start[0] = start[0] + 18;
+	fire_rail (ent, start, forward, 500, 10);
+ if ( tr.ent && ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client)) ) // Trace the line
+ {
+        VectorScale(start, 5000, start); //Where to hit? Edit -5000 to whatever you like the push to be
+        VectorAdd(start, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+ }
+		start[0] = start[0] - 9;
+	fire_rail (ent, start, forward, 500, 10);
+	 if ( tr.ent && ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client)) ) // Trace the line
+ {
+        VectorScale(start, 5000, start); //Where to hit? Edit -5000 to whatever you like the push to be
+        VectorAdd(start, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+ }
+	start[0] = start[0] + 18;
+	fire_rail (ent, start, forward, 500, 10);
+	 if ( tr.ent && ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client)) ) // Trace the line
+ {
+        VectorScale(start, 5000, start); //Where to hit? Edit -5000 to whatever you like the push to be
+        VectorAdd(start, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+ }
+	start[0] = start[0] + 18;
+	fire_rail (ent, start, forward, 500, 10);
+	 if ( tr.ent && ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client)) ) // Trace the line
+ {
+        VectorScale(start, 5000, start); //Where to hit? Edit -5000 to whatever you like the push to be
+        VectorAdd(start, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+ }
+	start[0] = start[0] + 18;
+	fire_rail (ent, start, forward, 500, 10);
+	 if ( tr.ent && ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client)) ) // Trace the line
+ {
+        VectorScale(start, 5000, start); //Where to hit? Edit -5000 to whatever you like the push to be
+        VectorAdd(start, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+ }
+	start[0] = start[0] + 18;
+	fire_rail (ent, start, forward, 500, 10);
+	 if ( tr.ent && ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client)) ) // Trace the line
+ {
+        VectorScale(start, 5000, start); //Where to hit? Edit -5000 to whatever you like the push to be
+        VectorAdd(start, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+ }
+	start[0] = start[0] + 18;
+	fire_rail (ent, start, forward, 500, 10);
+	 if ( tr.ent && ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client)) ) // Trace the line
+ {
+        VectorScale(start, 5000, start); //Where to hit? Edit -5000 to whatever you like the push to be
+        VectorAdd(start, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+ }
+	start[0] = start[0] + 18;
+	fire_rail (ent, start, forward, 500, 10);
+	 if ( tr.ent && ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client)) ) // Trace the line
+ {
+        VectorScale(start, 5000, start); //Where to hit? Edit -5000 to whatever you like the push to be
+        VectorAdd(start, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+ }
+		start[0] = start[0] - 9;
+	fire_rail (ent, start, forward, 500, 10);
+	 if ( tr.ent && ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client)) ) // Trace the line
+ {
+        VectorScale(start, 5000, start); //Where to hit? Edit -5000 to whatever you like the push to be
+        VectorAdd(start, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+ }
+	start[0] = start[0] + 18;
+	fire_rail (ent, start, forward, 500, 10);
+	 if ( tr.ent && ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client)) ) // Trace the line
+ {
+        VectorScale(start, 5000, start); //Where to hit? Edit -5000 to whatever you like the push to be
+        VectorAdd(start, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+ }
+	start[0] = start[0] + 18;
+	fire_rail (ent, start, forward, 500, 10);
+	 if ( tr.ent && ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client)) ) // Trace the line
+ {
+        VectorScale(start, 5000, start); //Where to hit? Edit -5000 to whatever you like the push to be
+        VectorAdd(start, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+ }
+	start[0] = start[0] + 18;
+	fire_rail (ent, start, forward, 500, 10);
+	 if ( tr.ent && ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client)) ) // Trace the line
+ {
+        VectorScale(start, 5000, start); //Where to hit? Edit -5000 to whatever you like the push to be
+        VectorAdd(start, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+ }
+	start[0] = start[0] + 18;
+	fire_rail (ent, start, forward, 500, 10);
+	 if ( tr.ent && ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client)) ) // Trace the line
+ {
+        VectorScale(start, 5000, start); //Where to hit? Edit -5000 to whatever you like the push to be
+        VectorAdd(start, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+ }
+	start[0] = start[0] + 18;
+	fire_rail (ent, start, forward, 500, 10);
+	 if ( tr.ent && ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client)) ) // Trace the line
+ {
+        VectorScale(start, 5000, start); //Where to hit? Edit -5000 to whatever you like the push to be
+        VectorAdd(start, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+ }
+	start[0] = start[0] + 18;
+	fire_rail (ent, start, forward, 500, 10);
+	 if ( tr.ent && ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client)) ) // Trace the line
+ {
+        VectorScale(start, 5000, start); //Where to hit? Edit -5000 to whatever you like the push to be
+        VectorAdd(start, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+ }
+		start[0] = start[0] - 9;
+	fire_rail (ent, start, forward, 500, 10);
+	 if ( tr.ent && ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client)) ) // Trace the line
+ {
+        VectorScale(start, 5000, start); //Where to hit? Edit -5000 to whatever you like the push to be
+        VectorAdd(start, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+ }
+	start[0] = start[0] + 18;
+	fire_rail (ent, start, forward, 500, 10);
+	 if ( tr.ent && ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client)) ) // Trace the line
+ {
+        VectorScale(start, 5000, start); //Where to hit? Edit -5000 to whatever you like the push to be
+        VectorAdd(start, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+ }
+	start[0] = start[0] + 18;
+	fire_rail (ent, start, forward, 500, 10);
+	 if ( tr.ent && ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client)) ) // Trace the line
+ {
+        VectorScale(start, 5000, start); //Where to hit? Edit -5000 to whatever you like the push to be
+        VectorAdd(start, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+ }
+	start[0] = start[0] + 18;
+	fire_rail (ent, start, forward, 500, 10);
+	 if ( tr.ent && ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client)) ) // Trace the line
+ {
+        VectorScale(start, 5000, start); //Where to hit? Edit -5000 to whatever you like the push to be
+        VectorAdd(start, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+ }
+	start[0] = start[0] + 18;
+	fire_rail (ent, start, forward, 500, 10);
+	 if ( tr.ent && ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client)) ) // Trace the line
+ {
+        VectorScale(start, 5000, start); //Where to hit? Edit -5000 to whatever you like the push to be
+        VectorAdd(start, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+ }
+	start[0] = start[0] + 18;
+	fire_rail (ent, start, forward, 500, 10);
+	 if ( tr.ent && ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client)) ) // Trace the line
+ {
+        VectorScale(start, 5000, start); //Where to hit? Edit -5000 to whatever you like the push to be
+        VectorAdd(start, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+ }
+	start[0] = start[0] + 18;
+	fire_rail (ent, start, forward, 500, 10);
+	 if ( tr.ent && ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client)) ) // Trace the line
+ {
+        VectorScale(start, 5000, start); //Where to hit? Edit -5000 to whatever you like the push to be
+        VectorAdd(start, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+ }
+
+	 /*
+	storage[0] = storage[0] - 9;
+	fire_rail (ent, storage, forward, 0, 0);
+	storage[0] = storage[0] - 18;
+	fire_rail (ent, storage, forward, 0, 0);
+	storage[0] = storage[0] - 18;
+	fire_rail (ent, storage, forward, 0, 0);
+	storage[0] = storage[0] - 18;
+	fire_rail (ent, storage, forward, 0, 0);
+	storage[0] = storage[0] - 18;
+	fire_rail (ent, storage, forward, 0, 0);
+	storage[0] = storage[0] - 18;
+	fire_rail (ent, storage, forward, 0, 0);
+	storage[0] = storage[0] - 18;
+	fire_rail (ent, storage, forward, 0, 0);
+		storage[0] = storage[0] - 9;
+	fire_rail (ent, storage, forward, 0, 0);
+	storage[0] = storage[0] - 18;
+	fire_rail (ent, storage, forward, 0, 0);
+	storage[0] = storage[0] - 18;
+	fire_rail (ent, storage, forward, 0, 0);
+	storage[0] = storage[0] - 18;
+	fire_rail (ent, storage, forward, 0, 0);
+	storage[0] = storage[0] - 18;
+	fire_rail (ent, storage, forward, 0, 0);
+	storage[0] = storage[0] - 18;
+	fire_rail (ent, storage, forward, 0, 0);
+	storage[0] = storage[0] - 18;
+	fire_rail (ent, storage, forward, 0, 0);
+		storage[0] = storage[0] - 9;
+	fire_rail (ent, storage, forward, 0, 0);
+	storage[0] = storage[0] - 18;
+	fire_rail (ent, storage, forward, 0, 0);
+	storage[0] = storage[0] - 18;
+	fire_rail (ent, storage, forward, 0, 0);
+	storage[0] = storage[0] - 18;
+	fire_rail (ent, storage, forward, 0, 0);
+	storage[0] = storage[0] - 18;
+	fire_rail (ent, storage, forward, 0, 0);
+	storage[0] = storage[0] - 18;
+	fire_rail (ent, storage, forward, 0, 0);
+	storage[0] = storage[0] - 18;
+	fire_rail (ent, storage, forward, 0, 0);
+		storage[0] = storage[0] - 9;
+	fire_rail (ent, storage, forward, 0, 0);
+	storage[0] = storage[0] - 18;
+	fire_rail (ent, storage, forward, 0, 0);
+	storage[0] = storage[0] - 18;
+	fire_rail (ent, storage, forward, 0, 0);
+	storage[0] = storage[0] - 18;
+	fire_rail (ent, storage, forward, 0, 0);
+	storage[0] = storage[0] - 18;
+	fire_rail (ent, storage, forward, 0, 0);
+	storage[0] = storage[0] - 18;
+	fire_rail (ent, storage, forward, 0, 0);
+	storage[0] = storage[0] - 18;
+	fire_rail (ent, storage, forward, 0, 0);*/
+ 	// send muzzle flash
+	gi.WriteByte (svc_muzzleflash);
+	gi.WriteShort (ent-g_edicts);
+	gi.WriteByte (MZ_RAILGUN | is_silenced);
+	gi.multicast (ent->s.origin, MULTICAST_PVS);
+ if ( tr.ent && ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client)) ) // Trace the line
+ {
+        VectorScale(forward, 5000, forward); //Where to hit? Edit -5000 to whatever you like the push to be
+        VectorAdd(forward, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+ }
 	if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
-		ent->client->pers.inventory[ent->client->ammo_index] -= 2;
+		 ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] -= 20;
+		if (ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] < 1) // requires 10 cells
+		ent->client->pers.inventory[ent->client->ammo_index] = 1;
+		//ent->client->pers.inventory[ent->client->ammo_index] -= 2;
+	return;
 }
 
 void Weapon_SuperShotgun (edict_t *ent)
@@ -1282,7 +1785,7 @@ RAILGUN
 
 void weapon_railgun_fire (edict_t *ent)
 {
-	vec3_t		start;
+	/*vec3_t		start;
 	vec3_t		forward, right;
 	vec3_t		offset;
 	int			damage;
@@ -1324,7 +1827,58 @@ void weapon_railgun_fire (edict_t *ent)
 	PlayerNoise(ent, start, PNOISE_WEAPON);
 
 	if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
-		ent->client->pers.inventory[ent->client->ammo_index]--;
+		ent->client->pers.inventory[ent->client->ammo_index]--;*/ 
+	//johnny b
+/*
+=================
+Cmd_Pull_f
+Added by Paril for Push/Pull
+=================
+*/
+ vec3_t  start;
+ vec3_t  forward;
+ vec3_t  end;
+ trace_t tr;
+ vec3_t offset;
+ vec3_t right;
+
+if (ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] < 5) // requires 10 cells
+{
+			gi.cprintf (ent, PRINT_HIGH, "You need 5 mana to use Push\n"); // Notify them
+			ent->client->ps.gunframe++;
+    return; // Stop the command from going
+}
+ ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] -= 5;
+ 	if (ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] < 1) // requires 10 cells
+		ent->client->pers.inventory[ent->client->ammo_index] = 1;
+ VectorCopy(ent->s.origin, start); // Copy your location
+ start[2] += ent->viewheight; // vector for start is at your height of view
+ AngleVectors(ent->client->v_angle, forward, NULL, NULL); // Angles
+ VectorMA(start, 8192, forward, end); // How far will the line go?
+ tr = gi.trace(start, NULL, NULL, end, ent, MASK_SHOT); // Trace the line
+ gi.sound (ent, CHAN_AUTO, gi.soundindex ("items/damage2.wav"), 1, ATTN_NORM, 0);
+ ent->client->ps.gunframe++;
+
+ //rail gun effect
+ 	AngleVectors (ent->client->v_angle, forward, right, NULL);
+
+	VectorScale (forward, -3, ent->client->kick_origin);
+	ent->client->kick_angles[0] = -3;
+
+	VectorSet(offset, 0, 7,  ent->viewheight-8);
+	P_ProjectSource (ent->client, ent->s.origin, offset, forward, right, start);
+	fire_rail (ent, start, forward, 0, 0);
+ 	// send muzzle flash
+	gi.WriteByte (svc_muzzleflash);
+	gi.WriteShort (ent-g_edicts);
+	gi.WriteByte (MZ_RAILGUN | is_silenced);
+	gi.multicast (ent->s.origin, MULTICAST_PVS);
+ if ( tr.ent && ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client)) ) // Trace the line
+ {
+        VectorScale(forward, -5000, forward); //Where to hit? Edit -5000 to whatever you like the push to be
+        VectorAdd(forward, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+ }
+ return;
 }
 
 
@@ -1347,7 +1901,7 @@ BFG10K
 
 void weapon_bfg_fire (edict_t *ent)
 {
-	vec3_t	offset, start;
+	/*vec3_t	offset, start;
 	vec3_t	forward, right;
 	int		damage;
 	float	damage_radius = 1000;
@@ -1400,7 +1954,70 @@ void weapon_bfg_fire (edict_t *ent)
 	PlayerNoise(ent, start, PNOISE_WEAPON);
 
 	if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
-		ent->client->pers.inventory[ent->client->ammo_index] -= 50;
+		ent->client->pers.inventory[ent->client->ammo_index] -= 50;*/
+	vec3_t  start;
+	vec3_t  forward;
+	vec3_t  end;
+	trace_t tr;
+	trace_t tr2;
+	trace_t tr3;
+
+	if (ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] < 1) // requires 10 cells
+		ent->client->pers.inventory[ent->client->ammo_index] = 1;
+	if (ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] < 1) // requires 10 cells
+	{
+		gi.cprintf (ent, PRINT_HIGH, "You need 1 mana to use Teleport\n"); // Notify them
+			ent->client->ps.gunframe = 17;
+			ent->client->ps.gunframe++;
+		return; // Stop the command from going
+	}
+    ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] -= 1;
+ 	if (ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] < 1) // requires 10 cells
+		ent->client->pers.inventory[ent->client->ammo_index] = 1;
+	VectorCopy(ent->s.origin, start); // Copy your location
+	start[2] += ent->viewheight; // vector for start is at your height of view
+	AngleVectors(ent->client->v_angle, forward, NULL, NULL); // Angles
+	VectorMA(start, 475, forward, end); // How far will the line go?
+	//int	content_mask = MASK_JOHN;
+	tr = gi.trace(start, NULL, NULL, end, ent, MASK_ALL); // Trace the line
+	VectorMA(start, 435, forward, end); // How far will the line go?
+	tr2 = gi.trace(start, NULL, NULL, end, ent, MASK_ALL); // Trace the line
+	//tr3.endpos[2] = tr2.endpos[2] - (tr3.endpos[2] - tr2.endpos[2]);
+	//tr3.endpos[1] = tr2.endpos[1] - (tr3.endpos[1] - tr2.endpos[1]);
+	//tr3.endpos[0] = tr2.endpos[0] - (tr3.endpos[0] - tr2.endpos[0]);
+	gi.dprintf("x: %i\n", tr.endpos[0]);
+	gi.dprintf("y: %i\n", tr.endpos[1]);
+	gi.dprintf("z: %i\n", tr.endpos[2]);
+
+	//tr.endpos[2] = tr.endpos[2] - 25;
+	//tr.endpos[1] = tr.endpos[1] - 25;
+	if(tr.endpos[1] > 0)
+		tr.endpos[1] = tr.endpos[1] - 30;
+	if(tr.endpos[1] < 0)
+		tr.endpos[1] = tr.endpos[1] + 30;
+	if(tr.endpos[0] > 0)
+		tr.endpos[0] = tr.endpos[0] - 30;
+	if(tr.endpos[0] < 0)
+		tr.endpos[0] = tr.endpos[0] + 30;
+	if(tr.endpos[2] > 0)
+		tr.endpos[2] = tr.endpos[2] - 30;
+	if(tr.endpos[2] < 0)
+		tr.endpos[2] = tr.endpos[2] + 30;
+	//tr.endpos = tr.endpos - 10;
+	//tr.ent->svflags;
+	gi.sound (ent, CHAN_AUTO, gi.soundindex ("items/damage2.wav"), 1, ATTN_NORM, 0);
+	ent->client->ps.gunframe = 17;
+	ent->client->ps.gunframe++;
+	//if ( tr.ent && ((tr.ent->svflags) || (tr.ent->client)) ) // Trace the line
+	//{
+			ent->s.event = EV_PLAYER_TELEPORT;
+			//VectorCopy(end, ent->s.origin);
+			VectorCopy(tr.endpos, ent->s.origin);
+			//VectorCopy(tr2.endpos - (tr3.endpos - tr2.endpos), end->s.origin);
+			//ent->s.origin = end;
+		    //VectorScale(forward, -5000, forward); //Where to hit? Edit -5000 to whatever you like the push to be
+			//VectorAdd(forward, tr.ent->velocity, tr.ent->velocity); // Adding velocity vectors
+	//}
 }
 
 void Weapon_BFG (edict_t *ent)
@@ -1411,5 +2028,62 @@ void Weapon_BFG (edict_t *ent)
 	Weapon_Generic (ent, 8, 32, 55, 58, pause_frames, fire_frames, weapon_bfg_fire);
 }
 
+/*
+=======================
+Punching/Melee
+=======================
+*/
+
+void Null_Fire(edict_t *ent)
+{
+	int	i;
+	vec3_t		start;
+	vec3_t		forward, right;
+	vec3_t		angles;
+	int			damage = 999; //change to whatever
+	int			kick = 10; //ditto here
+	vec3_t		offset;
+
+	if (ent->client->ps.gunframe == 11) //rename 11 to after you're attack frame
+	{
+		ent->client->ps.gunframe++;
+		return;
+	}
+
+	AngleVectors (ent->client->v_angle, forward, right, NULL);
+
+	VectorScale (forward, -2, ent->client->kick_origin);
+	ent->client->kick_angles[0] = -2;
+
+	VectorSet(offset, 0, 8,  ent->viewheight-8 );
+	P_ProjectSource (ent->client, ent->s.origin, offset, forward, right, start); //where does the hit start from?
+
+	if (is_quad)
+	{
+		damage *= 4;
+		kick *= 4;
+	}
+
+	// get start / end positions
+	VectorAdd (ent->client->v_angle, ent->client->kick_angles, angles);
+	AngleVectors (angles, forward, right, NULL);
+	VectorSet(offset, 0, 8, ent->viewheight-8 );
+	P_ProjectSource (ent->client, ent->s.origin, offset, forward, right, start);
+	fire_punch (ent, start, forward, 45, damage, 200, 1, MOD_PUNCH); // yep, matches the fire_ function	
+
+	ent->client->ps.gunframe++; //NEEDED
+	PlayerNoise(ent, start, PNOISE_WEAPON); //NEEDED
+
+//	if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
+//		ent->client->pers.inventory[ent->client->ammo_index]--; // comment these out to prevent the Minus NULL Ammo bug
+}
+
+void Weapon_Null (edict_t *ent)
+{
+	static int	pause_frames[]	= {10, 21, 0};
+	static int	fire_frames[]	= {6, 0}; // Frame stuff here
+
+	Weapon_Generic (ent, 3, 9, 22, 24, pause_frames, fire_frames, Null_Fire);
+}
 
 //======================================================================

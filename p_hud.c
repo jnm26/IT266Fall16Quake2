@@ -451,6 +451,26 @@ void G_SetStats (edict_t *ent)
 	{
 		ent->client->ps.stats[STAT_TIMER_ICON] = 0;
 		ent->client->ps.stats[STAT_TIMER] = 0;
+		
+		//item = &itemlist[ent->client->ammo_index];
+		//item = &itemlist[ent->client->pers.inventory[ITEM_INDEX(FindItem ("Slugs"))]];
+		//ent->client->pers.inventory[]
+		//ent->client->ps.stats[STAT_MANA_ICON] = gi.imageindex(item->icon);	// New
+		//ent->client->ps.stats[STAT_MANA] = ent->client->pers.inventory[ITEM_INDEX(FindItem ("Slugs"))];
+	if (!ent->client->ammo_index /* || !ent->client->pers.inventory[ent->client->ammo_index] */)
+	{
+		ent->client->ps.stats[STAT_AMMO_ICON] = 0;
+		ent->client->ps.stats[STAT_AMMO] = 0;
+	}
+	else
+	{
+		item = &itemlist[ent->client->ammo_index];
+		ent->client->ps.stats[STAT_MANA_ICON] = gi.imageindex (item->icon);
+		ent->client->ps.stats[STAT_MANA] = ent->client->pers.inventory[ent->client->ammo_index];
+	}
+		
+		//ent->client->ps.stats[STAT_AMMO_ICON] = gi.imageindex ();
+		//ent->client->ps.stats[STAT_AMMO] = 
 	}
 
 	//

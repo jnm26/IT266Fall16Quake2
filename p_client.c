@@ -364,6 +364,10 @@ void ClientObituary (edict_t *self, edict_t *inflictor, edict_t *attacker)
 				message = "tried to invade";
 				message2 = "'s personal space";
 				break;
+			case MOD_PUNCH:
+				message = "too";
+				message2 = "'s fist in the face";
+				break;
 			}
 			if (message)
 			{
@@ -398,10 +402,16 @@ void TossClientWeapon (edict_t *self)
 	if (!deathmatch->value)
 		return;
 
-	item = self->client->pers.weapon;
+	/*item = self->client->pers.weapon;
 	if (! self->client->pers.inventory[self->client->ammo_index] )
 		item = NULL;
 	if (item && (strcmp (item->pickup_name, "Blaster") == 0))
+		item = NULL;*/ //johnnyb
+
+	item = self->client->pers.weapon;
+	if (! self->client->pers.inventory[self->client->ammo_index] )
+		item = NULL;
+	if (item && (strcmp (item->pickup_name, "Hands") == 0))
 		item = NULL;
 
 	if (!((int)(dmflags->value) & DF_QUAD_DROP))
@@ -591,10 +601,13 @@ void InitClientPersistant (gclient_t *client)
 
 	memset (&client->pers, 0, sizeof(client->pers));
 
-	item = FindItem("Blaster");
+	/*item = FindItem("Blaster");
+	client->pers.selected_item = ITEM_INDEX(item);
+	client->pers.inventory[client->pers.selected_item] = 1;*/
+
+	item = FindItem("Hands");
 	client->pers.selected_item = ITEM_INDEX(item);
 	client->pers.inventory[client->pers.selected_item] = 1;
-
 	client->pers.weapon = item;
 
 	client->pers.health			= 100;
@@ -767,7 +780,7 @@ SelectFarthestDeathmatchSpawnPoint
 
 ================
 */
-edict_t *SelectFarthestDeathmatchSpawnPoint (void)
+edict_t *SelectFarthestDeathmatchSpawnPoint (void) //johnny b teleport
 {
 	edict_t	*bestspot;
 	float	bestdistance, bestplayerdistance;
@@ -1558,12 +1571,79 @@ This will be called once for each client frame, which will
 usually be a couple times for each server frame.
 ==============
 */
+int john;
 void ClientThink (edict_t *ent, usercmd_t *ucmd)
 {
 	gclient_t	*client;
 	edict_t	*other;
 	int		i, j;
 	pmove_t	pm;
+
+	//johnnyb
+	/*float ClassSpeedModifer, t;
+	vec3_t velo;
+	vec3_t  end, forward, right, up, add;
+
+	ClassSpeedModifer = ent->client->ClassSpeed * 0.2;
+	//Figure out speed
+    VectorClear (velo);
+	AngleVectors (ent->client->v_angle, forward, right, up);
+	VectorScale(forward, ucmd->forwardmove*ClassSpeedModifer, end);
+	VectorAdd(end,velo,velo);
+	AngleVectors (ent->client->v_angle, forward, right, up);
+	VectorScale(right, ucmd->sidemove*ClassSpeedModifer, end);
+	VectorAdd(end,velo,velo);
+	//if not in water set it up so they aren't moving up or down when they press forward
+	if (ent->waterlevel == 0)
+		velo[2] = 0;
+	if (ent->waterlevel==1)//feet are in the water
+	{
+		//Water slows you down or at least I think it should
+		velo[0] *= 0.875;
+		velo[1] *= 0.875;
+		velo[2] *= 0.875;
+		ClassSpeedModifer *= 0.875;
+	}
+	else if (ent->waterlevel==2)//waist is in the water
+	{
+		//Water slows you down or at least I think it should
+		velo[0] *= 0.75;
+		velo[1] *= 0.75;
+		velo[2] *= 0.75;
+		ClassSpeedModifer *= 0.75;
+	}
+	else if (ent->waterlevel==3)//whole body is in the water
+	{
+    	//Water slows you down or at least I think it should
+		velo[0] *= 0.6;
+		velo[1] *= 0.6;
+		velo[2] *= 0.6;
+		ClassSpeedModifer *= 0.6;
+	}
+	if (ent->groundentity)//add 
+		VectorAdd(velo,ent->velocity,ent->velocity);
+	else if (ent->waterlevel)
+		VectorAdd(velo,ent->velocity,ent->velocity);
+	else
+	{
+		//Allow for a little movement but not as much
+		velo[0] *= 0.25;
+		velo[1] *= 0.25;
+		velo[2] *= 0.25;
+		VectorAdd(velo,ent->velocity,ent->velocity);
+	}
+	//Make sure not going to fast. This slows down grapple too
+	t = VectorLength(ent->velocity);
+	if (t > 300*ClassSpeedModifer || t < -300*ClassSpeedModifer)
+	{
+		VectorScale (ent->velocity, 300 * ClassSpeedModifer / t, ent->velocity);
+	}
+ 
+	//Set these to 0 so pmove thinks we aren't pressing forward or sideways since we are handling all the player forward and sideways speeds
+	//ucmd->forwardmove = 0;
+	//ucmd->sidemove = 0; */
+	//mod done
+
 
 	level.current_entity = ent;
 	client = ent->client;
@@ -1579,7 +1659,14 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 	}
 
 	pm_passent = ent;
-
+	john++;
+	if(john == 350 && ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] < 15)
+	{
+		john = 0;
+		ent->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))]++;
+	}
+	if(john > 350)
+		john = 0;
 	if (ent->client->chase_target) {
 
 		client->resp.cmd_angles[0] = SHORT2ANGLE(ucmd->angles[0]);
@@ -1692,6 +1779,7 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 
 	// save light level the player is standing on for
 	// monster sighting AI
+	//johnny b lighting
 	ent->light_level = ucmd->lightlevel;
 
 	// fire weapon from final position if needed

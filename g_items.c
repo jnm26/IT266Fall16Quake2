@@ -16,6 +16,7 @@ void Weapon_Grenade (edict_t *ent);
 void Weapon_GrenadeLauncher (edict_t *ent);
 void Weapon_Railgun (edict_t *ent);
 void Weapon_BFG (edict_t *ent);
+void Weapon_Null (edict_t *ent); //johnnyb mod line
 
 gitem_armor_t jacketarmor_info	= { 25,  50, .30, .00, ARMOR_JACKET};
 gitem_armor_t combatarmor_info	= { 50, 100, .60, .30, ARMOR_COMBAT};
@@ -480,12 +481,16 @@ qboolean Pickup_Ammo (edict_t *ent, edict_t *other)
 	if (!Add_Ammo (other, ent->item, count))
 		return false;
 
-	if (weapon && !oldcount)
+	/*if (weapon && !oldcount)
 	{
 		if (other->client->pers.weapon != ent->item && ( !deathmatch->value || other->client->pers.weapon == FindItem("blaster") ) )
 			other->client->newweapon = ent->item;
+	}*/ //johnnyb
+	if (weapon && !oldcount)
+	{
+		if (other->client->pers.weapon != ent->item && ( !deathmatch->value || other->client->pers.weapon == FindItem("Hands") ) )
+			other->client->newweapon = ent->item;
 	}
-
 	if (!(ent->spawnflags & (DROPPED_ITEM | DROPPED_PLAYER_ITEM)) && (deathmatch->value))
 		SetRespawn (ent, 30);
 	return true;
@@ -602,10 +607,10 @@ qboolean Pickup_Armor (edict_t *ent, edict_t *other)
 	// handle armor shards specially
 	if (ent->item->tag == ARMOR_SHARD)
 	{
-		if (!old_armor_index)
-			other->client->pers.inventory[jacket_armor_index] = 2;
-		else
-			other->client->pers.inventory[old_armor_index] += 2;
+		//if (!old_armor_index) //johnny b armor
+			//other->client->pers.inventory[jacket_armor_index] = 2;
+		//else
+			other->client->pers.inventory[ITEM_INDEX(FindItem ("slugs"))] += 10;
 	}
 
 	// if player has no armor, just use it
@@ -1266,10 +1271,52 @@ gitem_t	itemlist[] =
 	// WEAPONS 
 	//
 
+	/*{//johnnyb
+        (weapon_null(,           //  The map entity name. dont include this in a map whatever you do.
+        NULL,                    // The pickup function
+        Use_Weapon,              // How to use
+        NULL,                    // the drop function
+       Weapon_Null,             //What the use function is
+       (misc/w_pkup.wav(,
+       (models/nullweapon.md2(,0,
+       (models/nullweapon.md2(, //The models stuff.(This is my Hands model)
+       (w_blaster(,             //Icon to be used. you could create another, you probably should
+       (Hands(,             //Pickup name. use this to give the item to someone at the start of the game
+        0,
+        0,
+        NULL,
+        IT_WEAPON|IT_STAY_COOP,
+        WEAP_BLASTER,            // the model index, just an integer defined in g_local.h
+        NULL,
+        0,
+        ((
+},*/
+
+{//johnnyb
+        "weapon_null",           //  The map entity name. dont include this in a map whatever you do.
+        NULL,                    // The pickup function
+        Use_Weapon,              // How to use
+        NULL,                    // the drop function
+       Weapon_Null,             //What the use function is
+       "misc/w_pkup.wav",
+       NULL, 0,
+       "models/weapons/v_blast/tris.md2", //The models stuff.(This is my Hands model)
+       "w_blaster",             //Icon to be used. you could create another, you probably should
+       "Hands",             //Pickup name. use this to give the item to someone at the start of the game
+        0,
+        0,
+        "Slugs",
+        IT_WEAPON|IT_STAY_COOP,
+        WEAP_BLASTER,            // the model index, just an integer defined in g_local.h
+        NULL,
+        0,
+		"weapons/blastf1a.wav misc/lasfly.wav"
+},
+
 /* weapon_blaster (.3 .3 1) (-16 -16 -16) (16 16 16)
 always owned, never in the world
 */
-	{
+	/*{
 		"weapon_blaster", 
 		NULL,
 		Use_Weapon,
@@ -1278,8 +1325,8 @@ always owned, never in the world
 		"misc/w_pkup.wav",
 		NULL, 0,
 		"models/weapons/v_blast/tris.md2",
-/* icon */		"w_blaster",
-/* pickup */	"Blaster",
+		"w_blaster", //icon
+     	"Blaster", //pickup
 		0,
 		0,
 		NULL,
@@ -1287,8 +1334,8 @@ always owned, never in the world
 		WEAP_BLASTER,
 		NULL,
 		0,
-/* precache */ "weapons/blastf1a.wav misc/lasfly.wav"
-	},
+        "weapons/blastf1a.wav misc/lasfly.wav" //precache
+	},  /*
 
 /*QUAKED weapon_shotgun (.3 .3 1) (-16 -16 -16) (16 16 16)
 */
@@ -1305,7 +1352,7 @@ always owned, never in the world
 /* pickup */	"Shotgun",
 		0,
 		1,
-		"Shells",
+		"Slugs",
 		IT_WEAPON|IT_STAY_COOP,
 		WEAP_SHOTGUN,
 		NULL,
@@ -1328,7 +1375,7 @@ always owned, never in the world
 /* pickup */	"Super Shotgun",
 		0,
 		2,
-		"Shells",
+		"Slugs",
 		IT_WEAPON|IT_STAY_COOP,
 		WEAP_SUPERSHOTGUN,
 		NULL,
@@ -1351,7 +1398,7 @@ always owned, never in the world
 /* pickup */	"Machinegun",
 		0,
 		1,
-		"Bullets",
+		"Slugs",
 		IT_WEAPON|IT_STAY_COOP,
 		WEAP_MACHINEGUN,
 		NULL,
@@ -1374,7 +1421,7 @@ always owned, never in the world
 /* pickup */	"Chaingun",
 		0,
 		1,
-		"Bullets",
+		"Slugs",
 		IT_WEAPON|IT_STAY_COOP,
 		WEAP_CHAINGUN,
 		NULL,
@@ -1396,8 +1443,8 @@ always owned, never in the world
 /* icon */		"a_grenades",
 /* pickup */	"Grenades",
 /* width */		3,
-		5,
-		"grenades",
+		1,
+		"Slugs",
 		IT_AMMO|IT_WEAPON,
 		WEAP_GRENADES,
 		NULL,
@@ -1420,7 +1467,7 @@ always owned, never in the world
 /* pickup */	"Grenade Launcher",
 		0,
 		1,
-		"Grenades",
+		"Slugs",
 		IT_WEAPON|IT_STAY_COOP,
 		WEAP_GRENADELAUNCHER,
 		NULL,
@@ -1443,7 +1490,7 @@ always owned, never in the world
 /* pickup */	"Rocket Launcher",
 		0,
 		1,
-		"Rockets",
+		"Slugs",
 		IT_WEAPON|IT_STAY_COOP,
 		WEAP_ROCKETLAUNCHER,
 		NULL,
@@ -1462,11 +1509,11 @@ always owned, never in the world
 		"misc/w_pkup.wav",
 		"models/weapons/g_hyperb/tris.md2", EF_ROTATE,
 		"models/weapons/v_hyperb/tris.md2",
-/* icon */		"w_hyperblaster",
+/* icon */		"w_railgun",
 /* pickup */	"HyperBlaster",
 		0,
 		1,
-		"Cells",
+		"Slugs",
 		IT_WEAPON|IT_STAY_COOP,
 		WEAP_HYPERBLASTER,
 		NULL,
@@ -1511,8 +1558,8 @@ always owned, never in the world
 /* icon */		"w_bfg",
 /* pickup */	"BFG10K",
 		0,
-		50,
-		"Cells",
+		1,
+		"Slugs",
 		IT_WEAPON|IT_STAY_COOP,
 		WEAP_BFG,
 		NULL,

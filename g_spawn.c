@@ -677,6 +677,15 @@ char *single_statusbar =
 "	pic	9 "
 "endif "
 
+// johnny b
+"if 18 "
+"	yb  -72 "
+"	xr	-58 "
+"	num 2	18 "
+"	xr	-24 "
+"	pic	19 "
+"endif "
+
 //  help / weapon icon 
 "if 11 "
 "	xv	148 "
@@ -838,7 +847,8 @@ void SP_worldspawn (edict_t *ent)
 
 	snd_fry = gi.soundindex ("player/fry.wav");	// standing in lava / slime
 
-	PrecacheItem (FindItem ("Blaster"));
+	//PrecacheItem (FindItem ("Blaster")); johnnyb
+	PrecacheItem (FindItem ("Hands"));
 
 	gi.soundindex ("player/lava1.wav");
 	gi.soundindex ("player/lava2.wav");
@@ -920,43 +930,43 @@ void SP_worldspawn (edict_t *ent)
 //
 // Setup light animation tables. 'a' is total darkness, 'z' is doublebright.
 //
-
+	//johnny b lighting
 	// 0 normal
-	gi.configstring(CS_LIGHTS+0, "m");
-	
+	//gi.configstring(CS_LIGHTS+0, "m");
+	gi.configstring(CS_LIGHTS+0, "wmamwamaaaaaaaaaaaaaaaaaaaaaaaaaaamwazwawwwwwwwwwwwwwwwwwwwwwww");
 	// 1 FLICKER (first variety)
-	gi.configstring(CS_LIGHTS+1, "mmnmmommommnonmmonqnmmo");
-	
+	//gi.configstring(CS_LIGHTS+1, "mmnmmommommnonmmonqnmmo");
+	gi.configstring(CS_LIGHTS+1, "aaaaaaaazzzzzzzz");
 	// 2 SLOW STRONG PULSE
-	gi.configstring(CS_LIGHTS+2, "abcdefghijklmnopqrstuvwxyzyxwvutsrqponmlkjihgfedcba");
-	
+	//gi.configstring(CS_LIGHTS+2, "abcdefghijklmnopqrstuvwxyzyxwvutsrqponmlkjihgfedcba");
+	gi.configstring(CS_LIGHTS+2, "aaaaaaaazzzzzzzz");
 	// 3 CANDLE (first variety)
-	gi.configstring(CS_LIGHTS+3, "mmmmmaaaaammmmmaaaaaabcdefgabcdefg");
-	
+	//gi.configstring(CS_LIGHTS+3, "mmmmmaaaaammmmmaaaaaabcdefgabcdefg");
+	gi.configstring(CS_LIGHTS+3, "aaaaaaaazzzzzzzz");
 	// 4 FAST STROBE
-	gi.configstring(CS_LIGHTS+4, "mamamamamama");
-	
+	//gi.configstring(CS_LIGHTS+4, "mamamamamama");
+	gi.configstring(CS_LIGHTS+4, "aaaaaaaazzzzzzzz");
 	// 5 GENTLE PULSE 1
-	gi.configstring(CS_LIGHTS+5,"jklmnopqrstuvwxyzyxwvutsrqponmlkj");
-	
+	//gi.configstring(CS_LIGHTS+5,"jklmnopqrstuvwxyzyxwvutsrqponmlkj");
+	gi.configstring(CS_LIGHTS+5, "aaaaaaaazzzzzzzz");
 	// 6 FLICKER (second variety)
-	gi.configstring(CS_LIGHTS+6, "nmonqnmomnmomomno");
-	
+	//gi.configstring(CS_LIGHTS+6, "nmonqnmomnmomomno");
+	gi.configstring(CS_LIGHTS+6, "aaaaaaaazzzzzzzz");
 	// 7 CANDLE (second variety)
-	gi.configstring(CS_LIGHTS+7, "mmmaaaabcdefgmmmmaaaammmaamm");
-	
+	//gi.configstring(CS_LIGHTS+7, "mmmaaaabcdefgmmmmaaaammmaamm");
+	gi.configstring(CS_LIGHTS+7, "aaaaaaaazzzzzzzz");
 	// 8 CANDLE (third variety)
-	gi.configstring(CS_LIGHTS+8, "mmmaaammmaaammmabcdefaaaammmmabcdefmmmaaaa");
-	
+	//gi.configstring(CS_LIGHTS+8, "mmmaaammmaaammmabcdefaaaammmmabcdefmmmaaaa");
+	gi.configstring(CS_LIGHTS+8, "aaaaaaaazzzzzzzz");
 	// 9 SLOW STROBE (fourth variety)
+	//gi.configstring(CS_LIGHTS+9, "aaaaaaaazzzzzzzz");
 	gi.configstring(CS_LIGHTS+9, "aaaaaaaazzzzzzzz");
-	
 	// 10 FLUORESCENT FLICKER
-	gi.configstring(CS_LIGHTS+10, "mmamammmmammamamaaamammma");
-
+	//gi.configstring(CS_LIGHTS+10, "mmamammmmammamamaaamammma");
+	gi.configstring(CS_LIGHTS+10, "aaaaaaaazzzzzzzz");
 	// 11 SLOW PULSE NOT FADE TO BLACK
-	gi.configstring(CS_LIGHTS+11, "abcdefghijklmnopqrrqponmlkjihgfedcba");
-	
+	//gi.configstring(CS_LIGHTS+11, "abcdefghijklmnopqrrqponmlkjihgfedcba");
+	gi.configstring(CS_LIGHTS+11, "aaaaaaaazzzzzzzz");
 	// styles 32-62 are assigned by the light program for switchable lights
 
 	// 63 testing
